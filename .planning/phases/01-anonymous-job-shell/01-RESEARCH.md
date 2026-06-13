@@ -708,7 +708,7 @@ DIRECT_URL=postgresql://postgres:<password>@db.<project-ref>.supabase.co:5432/po
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Worker Trigger Mechanism (Claude's Discretion)**
    - What we know: The worker runs on Railway; it must know when a new PENDING job exists.
