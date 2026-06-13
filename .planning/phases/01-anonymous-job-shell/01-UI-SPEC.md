@@ -60,9 +60,9 @@ Exceptions:
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body | 16px | 400 (regular) | 1.5 |
-| Label | 14px | 500 (medium) | 1.4 |
+| Label | 14px | 400 (regular) | 1.4 |
 | Heading | 24px | 600 (semibold) | 1.2 |
-| Display | 32px | 700 (bold) | 1.15 |
+| Display | 32px | 600 (semibold) | 1.15 |
 
 **Constraint:** Maximum 2 distinct weights used per view:
 - Submission page: 400 (body, placeholder, helper text) + 600 (heading, button label)
@@ -87,8 +87,9 @@ Accent reserved for:
 1. Primary "Clip It" submit button fill
 2. Progress bar filled portion (processing state)
 3. "Try again" button fill on failure state
+4. Focused input ring (implicit shadcn default focus ring — `ring-ring` token)
 
-Accent is NOT used for: input borders, helper text, status message text, page background, card borders.
+Accent is NOT used for: unfocused input borders, helper text, status message text, page background, card borders.
 
 Muted text color (helper text, placeholders, rotating status messages): `hsl(0 0% 63.9%)` — shadcn default muted-foreground.
 
