@@ -33,9 +33,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: Scaffold web app, backend API, and shared job model.
-- [ ] 01-02: Build anonymous submission form and validation.
-- [ ] 01-03: Build status/result shell and failure-state display.
+- [ ] 01-01-PLAN.md — Walking skeleton: scaffold Next.js 16 + Supabase + Prisma 7, Job model, submitJob Server Action, Vitest infrastructure
+- [ ] 01-02-PLAN.md — Submission form: YouTube URL + topic inputs, inline validation, loading overlay, client routing to /status
+- [ ] 01-03-PLAN.md — Status view: Supabase Realtime subscription, progress bar + rotating messages, failure Alert, Done state
 
 ### Phase 2: Transcript and Exact Search
 **Goal**: Retrieve timestamped YouTube transcripts and identify direct topic mentions.
