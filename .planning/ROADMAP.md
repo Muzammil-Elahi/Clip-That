@@ -13,7 +13,7 @@ Clip-That v1 builds from the lowest-risk proof points toward the full student wo
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Anonymous Job Shell** - User can submit a YouTube URL and topic and track processing status.
+- [x] **Phase 1: Anonymous Job Shell** - User can submit a YouTube URL and topic and track processing status.
 - [ ] **Phase 2: Transcript and Exact Search** - System can retrieve YouTube transcripts and find exact topic mentions.
 - [ ] **Phase 3: Context Clip Plan and Stitched Transcript** - System can build context windows and produce the transcript for selected segments.
 - [ ] **Phase 4: Stitched Video Output** - System can extract, stitch, play, and expire generated video artifacts.
@@ -43,7 +43,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [x] 01-02-PLAN.md — Submission form: YouTube URL + topic inputs, inline validation, loading overlay, client routing to /status
-- [ ] 01-03-PLAN.md — Status view: Supabase Realtime subscription, progress bar + rotating messages, failure Alert, Done state
+- [x] 01-03-PLAN.md — Status view: Supabase Realtime subscription, progress bar + rotating messages, failure Alert, Done state
 
 ### Phase 2: Transcript and Exact Search
 
@@ -148,7 +148,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Anonymous Job Shell | 2/3 | In Progress|  |
+| 1. Anonymous Job Shell | 3/3 | Complete | 2026-06-13 |
 | 2. Transcript and Exact Search | 0/2 | Not started | - |
 | 3. Context Clip Plan and Stitched Transcript | 0/2 | Not started | - |
 | 4. Stitched Video Output | 0/3 | Not started | - |
