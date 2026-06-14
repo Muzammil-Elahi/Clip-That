@@ -263,3 +263,18 @@ Or via Dashboard → Database → Replication → supabase_realtime → enable t
 ---
 *Phase: 01-anonymous-job-shell*
 *Completed: 2026-06-13*
+
+## Self-Check: PASSED
+
+- [x] `prisma/schema.prisma` exists with `model Job`
+- [x] `prisma.config.ts` exists with `defineConfig`
+- [x] `proxy.ts` exists with `export async function proxy`
+- [x] `src/lib/supabase/server.ts` contains `createServerClient` and `await cookies()`
+- [x] `src/lib/prisma.ts` contains `PrismaPg`
+- [x] `src/actions/submit-job.ts` contains `export async function submitJob` and `submitJobSchema`
+- [x] `vitest.config.mts` exists with `defineConfig`
+- [x] `src/__tests__/youtube.test.ts` exists — 12 tests pass
+- [x] `src/__tests__/submit-job.test.ts` exists — 8 tests pass
+- [x] Commit `3b669e9` exists (task commit)
+- [x] Commit `ba8395c` exists (docs/metadata commit)
+- [x] `.planning/phases/01-anonymous-job-shell/01-01-SUMMARY.md` exists
