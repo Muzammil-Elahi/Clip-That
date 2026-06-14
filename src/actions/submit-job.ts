@@ -52,24 +52,25 @@ export async function submitJob(
 
   // 2. Validate session server-side (T-01-01 — always getUser, never getSession)
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-  if (!user) {
+  if (authError || !user) {
     return { error: 'No session — please refresh and try again.' }
   }
 
   // 3. Create the job row (RLS enforces userId = auth.uid() — T-01-04)
   const { youtubeUrl, topic } = result.data
-  const job = await prisma.job.create({
-    data: {
-      userId: user.id,
-      youtubeUrl,
-      topic,
-      status: 'PENDING',
-    },
-  })
-
-  return { jobId: job.id }
+  try {
+    const job = await prisma.job.create({
+      data: {
+        userId: user.id,
+        youtubeUrl,
+        topic,
+        status: 'PENDING',
+      },
+    })
+    return { jobId: job.id }
+  } catch {
+    return { error: 'Failed to create job — please try again.' }
+  }
 }

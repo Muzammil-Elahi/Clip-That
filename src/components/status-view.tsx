@@ -42,7 +42,7 @@ interface StatusViewProps {
 export default function StatusView({
   userId,
   initialStatus,
-  initialJobId: _initialJobId,
+  initialJobId,
   initialErrorMessage,
 }: StatusViewProps) {
   const router = useRouter()
@@ -66,7 +66,7 @@ export default function StatusView({
   useEffect(() => {
     const supabase = createClient()
     const channel = supabase
-      .channel(`job-status-${userId}`)
+      .channel(`job-status-${initialJobId}`)
       .on(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         'postgres_changes' as any,
@@ -74,10 +74,7 @@ export default function StatusView({
           event: 'UPDATE',
           schema: 'public',
           table: 'Job',
-          // Note: the filter column name must match the exact PostgreSQL column
-          // casing. Prisma generates "userId" as camelCase in PostgreSQL
-          // (verify with \d "Job" after migration). Pitfall 3 from RESEARCH.md.
-          filter: `userId=eq.${userId}`,
+          filter: `id=eq.${initialJobId}`,
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (payload: any) => {
@@ -90,7 +87,7 @@ export default function StatusView({
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [userId])
+  }, [initialJobId])
 
   // Progress animation — drives the progress bar from 10% toward 90% during
   // PENDING/PROCESSING, then snaps to 100% when DONE
