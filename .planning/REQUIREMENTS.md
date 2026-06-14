@@ -9,11 +9,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Submission
 
-- [ ] **SUB-01**: User can submit a YouTube video URL.
-- [ ] **SUB-02**: User can enter a topic or phrase to search for in the video.
+- [x] **SUB-01**: User can submit a YouTube video URL.
+- [x] **SUB-02**: User can enter a topic or phrase to search for in the video.
 - [ ] **SUB-03**: User can choose exact transcript matching.
 - [ ] **SUB-04**: User can optionally enable semantic reference matching before processing.
-- [ ] **SUB-05**: User can submit a job without creating an account.
+- [x] **SUB-05**: User can submit a job without creating an account.
 
 ### Transcript Retrieval
 
@@ -58,8 +58,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Job Status and Errors
 
-- [ ] **JOB-01**: User can see processing status after submitting a job.
-- [ ] **JOB-02**: User can see a clear failure state if transcript retrieval, matching, media processing, or note generation fails.
+- [x] **JOB-01**: User can see processing status after submitting a job.
+- [x] **JOB-02**: User can see a clear failure state if transcript retrieval, matching, media processing, or note generation fails.
 - [ ] **JOB-03**: System can expire anonymous job artifacts after a configured retention window.
 
 ## v2 Requirements
@@ -107,11 +107,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SUB-01 | Phase 1 | Pending |
-| SUB-02 | Phase 1 | Pending |
+| SUB-01 | Phase 1 | Complete |
+| SUB-02 | Phase 1 | Complete |
 | SUB-03 | Phase 2 | Pending |
 | SUB-04 | Phase 6 | Pending |
-| SUB-05 | Phase 1 | Pending |
+| SUB-05 | Phase 1 | Complete |
 | TRN-01 | Phase 2 | Pending |
 | TRN-02 | Phase 2 | Pending |
 | TRN-03 | Phase 2 | Pending |
@@ -135,11 +135,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NOT-03 | Phase 5 | Pending |
 | NOT-04 | Phase 5 | Pending |
 | NOT-05 | Phase 5 | Pending |
-| JOB-01 | Phase 1 | Pending |
-| JOB-02 | Phase 1 | Pending |
+| JOB-01 | Phase 1 | Complete |
+| JOB-02 | Phase 1 | Complete |
 | JOB-03 | Phase 4 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 31 total
 - Mapped to phases: 31
 - Unmapped: 0

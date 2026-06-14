@@ -38,7 +38,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 **Wave 1**
 
-- [ ] 01-01-PLAN.md — Walking skeleton: scaffold Next.js 16 + Supabase + Prisma 7, Job model, submitJob Server Action, Vitest infrastructure
+- [x] 01-01-PLAN.md — Walking skeleton: scaffold Next.js 16 + Supabase + Prisma 7, Job model, submitJob Server Action, Vitest infrastructure
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -148,7 +148,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Anonymous Job Shell | 0/3 | Not started | - |
+| 1. Anonymous Job Shell | 1/3 | In Progress|  |
 | 2. Transcript and Exact Search | 0/2 | Not started | - |
 | 3. Context Clip Plan and Stitched Transcript | 0/2 | Not started | - |
 | 4. Stitched Video Output | 0/3 | Not started | - |
