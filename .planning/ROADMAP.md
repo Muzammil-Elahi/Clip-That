@@ -42,7 +42,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-02-PLAN.md — Submission form: YouTube URL + topic inputs, inline validation, loading overlay, client routing to /status
+- [x] 01-02-PLAN.md — Submission form: YouTube URL + topic inputs, inline validation, loading overlay, client routing to /status
 - [ ] 01-03-PLAN.md — Status view: Supabase Realtime subscription, progress bar + rotating messages, failure Alert, Done state
 
 ### Phase 2: Transcript and Exact Search
@@ -148,7 +148,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Anonymous Job Shell | 1/3 | In Progress|  |
+| 1. Anonymous Job Shell | 2/3 | In Progress|  |
 | 2. Transcript and Exact Search | 0/2 | Not started | - |
 | 3. Context Clip Plan and Stitched Transcript | 0/2 | Not started | - |
 | 4. Stitched Video Output | 0/3 | Not started | - |
