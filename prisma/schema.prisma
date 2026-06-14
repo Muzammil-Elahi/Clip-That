@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  // Note: URL is managed by prisma.config.ts in Prisma 7 — no url field here
+}
+
+enum JobStatus {
+  PENDING
+  PROCESSING
+  DONE
+  FAILED
+}
+
+model Job {
+  id           String    @id @default(uuid())
+  userId       String
+  youtubeUrl   String
+  topic        String
+  status       JobStatus @default(PENDING)
+  errorMessage String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([userId])
+}
