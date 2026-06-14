@@ -12,8 +12,7 @@
  * Note: Supabase Realtime live subscription is mocked — integration tested manually.
  */
 
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import StatusView from '@/components/status-view'
 
@@ -100,7 +99,7 @@ describe('StatusView', () => {
     expect(screen.getByText('Done!')).toBeInTheDocument()
   })
 
-  it('"Try again" button calls router.push("/") when clicked', async () => {
+  it('"Try again" button calls router.push("/") when clicked', () => {
     render(
       <StatusView
         {...baseProps}
@@ -110,7 +109,7 @@ describe('StatusView', () => {
     )
 
     const tryAgainButton = screen.getByRole('button', { name: /try again/i })
-    await userEvent.click(tryAgainButton)
+    fireEvent.click(tryAgainButton)
 
     expect(mockPush).toHaveBeenCalledWith('/')
     expect(mockPush).toHaveBeenCalledTimes(1)
