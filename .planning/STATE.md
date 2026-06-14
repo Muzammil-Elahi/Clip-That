@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Plan 01-03 complete (Phase 01 complete)
-last_updated: "2026-06-13T22:45:00.000Z"
-last_activity: 2026-06-13 -- Plan 01-03 StatusView Realtime component complete (30/30 tests pass, build passes)
+status: verified
+stopped_at: Phase 01 verified (human_needed — 2 live infrastructure items)
+last_updated: "2026-06-13T22:55:00.000Z"
+last_activity: 2026-06-13 -- Phase 01 verification complete (12/14 truths verified; 2 human items: anonymous session live check + Prisma migration)
 progress:
   total_phases: 6
   completed_phases: 1
@@ -21,16 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-07)
 
 **Core value:** Students can turn a long video into a focused study artifact for a specific topic without rewatching the whole video.
-**Current focus:** Phase 01 — anonymous-job-shell
+**Current focus:** Phase 01 — anonymous-job-shell (complete, verified)
 
 ## Current Position
 
-Phase: 01 (anonymous-job-shell) — COMPLETE
+Phase: 01 (anonymous-job-shell) — COMPLETE, VERIFIED
 Plan: 3 of 3 (all complete)
-Status: Phase 01 complete; ready for Phase 02
-Last activity: 2026-06-13 -- Plan 01-03 StatusView Realtime component complete (30/30 tests pass, build passes)
+Status: Phase 01 verified; 2 human verification items pending before proceeding to Phase 02
+Last activity: 2026-06-13 -- Phase 01 verification complete (12/14 truths verified; 2 human items: anonymous session live check + Prisma migration)
 
 Progress: [████████░░] 100% (Phase 01)
+
+## Human Verification Required Before Phase 02
+
+1. **Anonymous session establishment** — Load localhost:3000, confirm anonymous user appears in Supabase Auth dashboard.
+2. **Prisma migration** — Run `npx prisma migrate dev --name init` with session-mode pooler DIRECT_URL; confirm Job table, RLS policies, and Realtime publication in Supabase dashboard.
+
+See `.planning/phases/01-anonymous-job-shell/01-VERIFICATION.md` for full instructions.
 
 ## Performance Metrics
 
@@ -92,6 +99,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-13T22:45:00Z
-Stopped at: Plan 01-03 complete (Phase 01 complete)
-Resume file: .planning/phases/01-anonymous-job-shell/01-03-SUMMARY.md
+Last session: 2026-06-13T22:55:00Z
+Stopped at: Phase 01 verified (human_needed — 2 live infrastructure items)
+Resume file: .planning/phases/01-anonymous-job-shell/01-VERIFICATION.md
