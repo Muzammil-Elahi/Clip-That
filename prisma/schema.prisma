@@ -22,6 +22,8 @@ model Job {
   topic        String
   status       JobStatus @default(PENDING)
   errorMessage String?
+  transcript   Json?
+  clipPlan     Json?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 

@@ -1,13 +1,6 @@
 /**
- * Client-side JobStatus enum — mirrors the Prisma JobStatus enum for use in
- * browser components and Server Actions without importing from generated Prisma client.
+ * Worker-local type definitions. Mirror src/types/job.ts — keep in sync.
  */
-export enum JobStatus {
-  PENDING = 'PENDING',
-  PROCESSING = 'PROCESSING',
-  DONE = 'DONE',
-  FAILED = 'FAILED',
-}
 
 /**
  * A single timestamped caption segment returned by youtube-transcript-plus.
@@ -29,21 +22,4 @@ export interface ClipMatch {
   endMs: number            // Math.round((segment.offset + segment.duration) * 1000)
   text: string             // raw transcript text of matched segment(s)
   segmentIndices: number[] // indices into transcript array (for Phase 3)
-}
-
-/**
- * Client-side Job type — mirrors the Prisma Job model shape for use in
- * components and Server Actions. Timestamps serialised as ISO strings.
- */
-export interface Job {
-  id: string
-  userId: string
-  youtubeUrl: string
-  topic: string
-  status: JobStatus
-  errorMessage: string | null
-  transcript: TranscriptSegment[] | null
-  clipPlan: ClipMatch[] | null
-  createdAt: string
-  updatedAt: string
 }
