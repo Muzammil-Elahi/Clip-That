@@ -61,8 +61,13 @@ Plans:
 
 Plans:
 
-- [ ] 02-01: Implement YouTube transcript retrieval and unsupported-video handling.
-- [ ] 02-02: Implement transcript normalization, exact matching, and initial clip-plan records.
+**Wave 1**
+
+- [ ] 02-01-PLAN.md — Worker scaffold + schema migration: Railway worker process, youtube-transcript-plus integration, Prisma schema adds transcript Json? and clipPlan Json?, PENDING→DONE/FAILED transitions
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 02-02-PLAN.md — Exact matching + clip plan: normalize, findMatches (D-06/D-07/D-08), buildClipPlan wired into worker processing loop
 
 ### Phase 3: Context Clip Plan and Stitched Transcript
 
