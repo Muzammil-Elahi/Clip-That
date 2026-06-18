@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { submitJobSchema } from '@/actions/submit-job'
+import { submitJobSchema } from '@/lib/schemas'
 
 describe('submitJobSchema', () => {
   it('fails validation when both youtubeUrl and topic are empty strings', () => {

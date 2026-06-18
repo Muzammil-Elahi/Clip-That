@@ -3,22 +3,7 @@
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { createClient } from '@/lib/supabase/server'
-import { isYouTubeUrl } from '@/lib/youtube'
-
-/**
- * Zod validation schema for the job submission form.
- * Exported for unit-testing the validation logic in isolation.
- */
-export const submitJobSchema = z.object({
-  youtubeUrl: z
-    .string()
-    .url({ message: 'Enter a valid YouTube video URL.' })
-    .refine(isYouTubeUrl, { message: 'Enter a valid YouTube video URL.' }),
-  topic: z
-    .string()
-    .min(2, 'Enter at least 2 characters.')
-    .max(200, 'Keep it under 200 characters.'),
-})
+import { submitJobSchema } from '@/lib/schemas'
 
 type SubmitJobResult =
   | { errors: ReturnType<typeof submitJobSchema.safeParse>['error'] extends infer E ? E extends z.ZodError ? ReturnType<z.ZodError['flatten']> : never : never }

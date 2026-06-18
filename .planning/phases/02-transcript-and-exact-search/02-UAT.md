@@ -3,23 +3,22 @@ status: testing
 phase: 02-transcript-and-exact-search
 source: [02-VERIFICATION.md]
 started: 2026-06-17T00:00:00Z
-updated: 2026-06-17T00:00:00Z
+updated: 2026-06-17T23:00:00Z
 ---
 
 ## Current Test
 
-number: 1
-name: SUB-03 exact-matching mode interpretation
+number: 3
+name: End-to-end FAILED path — no-caption video error message
 expected: |
-  Product owner confirms exact matching as the sole/default mode in Phase 2
-  satisfies SUB-03, OR confirms a UI toggle is required.
+  Submit a no-caption video job, run the worker, confirm status=FAILED and error message in Supabase.
 awaiting: user response
 
 ## Tests
 
 ### 1. SUB-03 interpretation — exact matching as default mode
 expected: Product owner confirms "User can choose exact transcript matching" is satisfied by exact matching being the only mode in Phase 2 (semantic matching arrives in Phase 6), with no UI toggle required now.
-result: [pending]
+result: pass
 
 ### 2. End-to-end DONE path — transcript + clip plan written to DB
 expected: |
@@ -46,9 +45,9 @@ result: [pending]
 ## Summary
 
 total: 3
-passed: 0
+passed: 1
 issues: 0
-pending: 3
+pending: 2
 skipped: 0
 blocked: 0
 
