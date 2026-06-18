@@ -1,0 +1,22 @@
+{
+  "name": "clip-that-worker",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node --experimental-strip-types src/index.ts",
+    "test": "vitest",
+    "test:run": "vitest --run",
+    "build": "npx prisma generate --schema=../prisma/schema.prisma"
+  },
+  "dependencies": {
+    "youtube-transcript-plus": "2.0.0",
+    "@prisma/client": "^7.8.0",
+    "@prisma/adapter-pg": "^7.8.0",
+    "pg": "^8.21.0",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.8",
+    "@types/node": "^20"
+  }
+}
