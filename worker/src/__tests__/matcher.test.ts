@@ -62,6 +62,9 @@ describe('findMatches', () => {
   })
 
   it('returns multiple matches when topic appears more than once', () => {
+    // Segment 0 matches single-segment (D-07), continue
+    // Segment 1 doesn't match single, but cross-boundary [1,2] contains "neural networks" — skip segment 2
+    // Result: two matches at [0] and [1,2]
     const segments: TranscriptSegment[] = [
       { text: 'neural networks are cool', offset: 0, duration: 2, lang: 'en' },
       { text: 'some other content', offset: 2, duration: 2, lang: 'en' },
@@ -70,7 +73,7 @@ describe('findMatches', () => {
     const result = findMatches(segments, 'neural networks')
     expect(result).toHaveLength(2)
     expect(result[0].segmentIndices).toEqual([0])
-    expect(result[1].segmentIndices).toEqual([2])
+    expect(result[1].segmentIndices).toEqual([1, 2])
   })
 
   it('does not use seg.start (only seg.offset) — no NaN in output', () => {
