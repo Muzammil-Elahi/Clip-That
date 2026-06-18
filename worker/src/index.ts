@@ -4,6 +4,7 @@ config({ path: '.env.local' })
 import { prisma } from './prisma.js'
 import { fetchTranscript, mapTranscriptError } from './transcript.js'
 import { extractYouTubeVideoId } from './youtube.js'
+import { buildClipPlan } from './matcher.js'
 import { Prisma } from '../../prisma/generated/prisma/client'
 
 const sleep = (ms: number) => new Promise<void>(res => setTimeout(res, ms))
@@ -34,12 +35,13 @@ async function processPendingJob(): Promise<void> {
     if (!videoId) throw new Error('Invalid YouTube URL')
 
     const segments = await fetchTranscript(videoId)
+    const clipPlan = buildClipPlan(segments, job.topic)
 
     await prisma.job.update({
       where: { id: job.id },
       data: {
         transcript: segments as unknown as Prisma.InputJsonValue,
-        clipPlan: [] as unknown as Prisma.InputJsonValue,
+        clipPlan: clipPlan as unknown as Prisma.InputJsonValue,
         status: 'DONE',
       },
     })
