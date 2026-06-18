@@ -25,12 +25,12 @@ describe('mapTranscriptError', () => {
   })
 
   it('returns rate-limit message for YoutubeTranscriptTooManyRequestError', () => {
-    const err = new YoutubeTranscriptTooManyRequestError('vid123')
+    const err = new YoutubeTranscriptTooManyRequestError()
     expect(mapTranscriptError(err)).toBe("YouTube is temporarily unavailable. Please try again in a few minutes.")
   })
 
   it('returns invalid-id message for YoutubeTranscriptInvalidVideoIdError', () => {
-    const err = new YoutubeTranscriptInvalidVideoIdError('bad-id')
+    const err = new YoutubeTranscriptInvalidVideoIdError()
     expect(mapTranscriptError(err)).toBe("Invalid YouTube video URL.")
   })
 
