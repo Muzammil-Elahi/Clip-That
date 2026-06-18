@@ -14,7 +14,7 @@ Clip-That v1 builds from the lowest-risk proof points toward the full student wo
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Anonymous Job Shell** - User can submit a YouTube URL and topic and track processing status.
-- [ ] **Phase 2: Transcript and Exact Search** - System can retrieve YouTube transcripts and find exact topic mentions.
+- [x] **Phase 2: Transcript and Exact Search** - System can retrieve YouTube transcripts and find exact topic mentions. (completed 2026-06-18)
 - [ ] **Phase 3: Context Clip Plan and Stitched Transcript** - System can build context windows and produce the transcript for selected segments.
 - [ ] **Phase 4: Stitched Video Output** - System can extract, stitch, play, and expire generated video artifacts.
 - [ ] **Phase 5: Study Notes and PDF** - User receives topic-specific study notes and can download them as a PDF.
@@ -67,7 +67,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 02-02-PLAN.md — Exact matching + clip plan: normalize, findMatches (D-06/D-07/D-08), buildClipPlan wired into worker processing loop
+- [x] 02-02-PLAN.md — Exact matching + clip plan: normalize, findMatches (D-06/D-07/D-08), buildClipPlan wired into worker processing loop
 
 ### Phase 3: Context Clip Plan and Stitched Transcript
 
@@ -154,7 +154,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Anonymous Job Shell | 3/3 | Complete | 2026-06-13 |
-| 2. Transcript and Exact Search | 1/2 | In Progress|  |
+| 2. Transcript and Exact Search | 2/2 | Complete   | 2026-06-18 |
 | 3. Context Clip Plan and Stitched Transcript | 0/2 | Not started | - |
 | 4. Stitched Video Output | 0/3 | Not started | - |
 | 5. Study Notes and PDF | 0/2 | Not started | - |
