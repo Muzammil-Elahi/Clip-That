@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "node --experimental-strip-types src/index.ts",
+    "start": "tsx src/index.ts",
     "test": "vitest",
     "test:run": "vitest --run",
     "build": "npx prisma generate --schema=../prisma/schema.prisma"
@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "vitest": "^4.1.8",
-    "@types/node": "^20"
+    "@types/node": "^20",
+    "tsx": "^4.19.4"
   }
 }

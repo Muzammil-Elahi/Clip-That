@@ -1,18 +1,14 @@
 ---
-status: testing
+status: complete
 phase: 02-transcript-and-exact-search
 source: [02-VERIFICATION.md]
 started: 2026-06-17T00:00:00Z
-updated: 2026-06-17T23:00:00Z
+updated: 2026-06-18T00:00:00Z
 ---
 
 ## Current Test
 
-number: 3
-name: End-to-end FAILED path — no-caption video error message
-expected: |
-  Submit a no-caption video job, run the worker, confirm status=FAILED and error message in Supabase.
-awaiting: user response
+[testing complete]
 
 ## Tests
 
@@ -30,7 +26,7 @@ expected: |
      - status = DONE
      - transcript = non-null JSON array of {text, offset, duration} objects
      - clipPlan = JSON array of ClipMatch objects with startMs, endMs, text, segmentIndices
-result: [pending]
+result: pass
 
 ### 3. End-to-end FAILED path — no-caption video error message
 expected: |
@@ -40,14 +36,14 @@ expected: |
   3. In Supabase dashboard → job row:
      - status = FAILED
      - errorMessage = "This video doesn't have a usable transcript."
-result: [pending]
+result: pass
 
 ## Summary
 
 total: 3
-passed: 1
+passed: 3
 issues: 0
-pending: 2
+pending: 0
 skipped: 0
 blocked: 0
 

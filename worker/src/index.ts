@@ -1,11 +1,29 @@
-import { config } from 'dotenv'
-config({ path: '.env.local' })
+import dns from 'node:dns'
+dns.setDefaultResultOrder('ipv4first')
 
-import { prisma } from './prisma.js'
+import { config } from 'dotenv'
+import { fileURLToPath } from 'node:url'
+import { dirname, resolve } from 'node:path'
+import pg from 'pg'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { PrismaClient } from '../../prisma/generated/prisma/client'
 import { fetchTranscript, mapTranscriptError } from './transcript.js'
 import { extractYouTubeVideoId } from './youtube.js'
 import { buildClipPlan } from './matcher.js'
 import { Prisma } from '../../prisma/generated/prisma/client'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+config({ path: resolve(__dirname, '../../.env.local') })
+
+if (!process.env.WORKER_DATABASE_URL && !process.env.DATABASE_URL) {
+  console.error('WORKER_DATABASE_URL is not set in .env.local — cannot connect to database')
+  process.exit(1)
+}
+
+const connectionString = (process.env.WORKER_DATABASE_URL ?? process.env.DATABASE_URL)!
+const pool = new pg.Pool({ connectionString, family: 4 })
+const adapter = new PrismaPg(pool)
+const prisma = new PrismaClient({ adapter })
 
 const sleep = (ms: number) => new Promise<void>(res => setTimeout(res, ms))
 
@@ -14,7 +32,6 @@ let processingJob = false
 
 process.on('SIGTERM', async () => {
   shutdown = true
-  // Wait for in-flight job to finish before exit
   while (processingJob) await sleep(200)
   await prisma.$disconnect()
   process.exit(0)
@@ -22,7 +39,8 @@ process.on('SIGTERM', async () => {
 
 async function processPendingJob(): Promise<void> {
   const job = await prisma.job.findFirst({ where: { status: 'PENDING' } })
-  if (!job) return
+  if (!job) { process.stdout.write('no pending jobs. '); return }
+  console.log(`\nPicked up job ${job.id} (${job.youtubeUrl}, topic: "${job.topic}")`)
 
   await prisma.job.update({
     where: { id: job.id },
@@ -33,10 +51,16 @@ async function processPendingJob(): Promise<void> {
   try {
     const videoId = extractYouTubeVideoId(job.youtubeUrl)
     if (!videoId) throw new Error('Invalid YouTube URL')
+    console.log(`  videoId: ${videoId}`)
 
+    console.log('  fetching transcript...')
     const segments = await fetchTranscript(videoId)
-    const clipPlan = buildClipPlan(segments, job.topic)
+    console.log(`  got ${segments.length} segments`)
 
+    const clipPlan = buildClipPlan(segments, job.topic)
+    console.log(`  clipPlan: ${clipPlan.length} matches`)
+
+    console.log('  writing DONE...')
     await prisma.job.update({
       where: { id: job.id },
       data: {
@@ -45,8 +69,11 @@ async function processPendingJob(): Promise<void> {
         status: 'DONE',
       },
     })
+    console.log('  DONE ✓')
   } catch (err) {
+    console.error('  ERROR:', err)
     const errorMessage = mapTranscriptError(err)
+    console.log(`  writing FAILED: ${errorMessage}`)
     await prisma.job.update({
       where: { id: job.id },
       data: { status: 'FAILED', errorMessage },
@@ -58,8 +85,12 @@ async function processPendingJob(): Promise<void> {
 
 async function main() {
   console.log('Worker started, polling for PENDING jobs...')
+  let tick = 0
   while (!shutdown) {
+    tick++
+    process.stdout.write(`[tick ${tick}] polling... `)
     await processPendingJob()
+    process.stdout.write('done\n')
     await sleep(4000)
   }
 }
