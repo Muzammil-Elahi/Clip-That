@@ -63,7 +63,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — Worker scaffold + schema migration: Railway worker process, youtube-transcript-plus integration, Prisma schema adds transcript Json? and clipPlan Json?, PENDING→DONE/FAILED transitions
+- [x] 02-01-PLAN.md — Worker scaffold + schema migration: Railway worker process, youtube-transcript-plus integration, Prisma schema adds transcript Json? and clipPlan Json?, PENDING→DONE/FAILED transitions
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -154,7 +154,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Anonymous Job Shell | 3/3 | Complete | 2026-06-13 |
-| 2. Transcript and Exact Search | 0/2 | Not started | - |
+| 2. Transcript and Exact Search | 1/2 | In Progress|  |
 | 3. Context Clip Plan and Stitched Transcript | 0/2 | Not started | - |
 | 4. Stitched Video Output | 0/3 | Not started | - |
 | 5. Study Notes and PDF | 0/2 | Not started | - |
