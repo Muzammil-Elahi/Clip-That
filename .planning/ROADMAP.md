@@ -85,8 +85,13 @@ Plans:
 
 Plans:
 
-- [ ] 03-01: Implement context-window expansion, overlap merging, and source timestamp preservation.
-- [ ] 03-02: Build stitched transcript generation and result-page transcript display.
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — Worker: context-window expansion (expandContextWindows), overlap merging (mergeOverlappingWindows), stitched transcript generation (buildStitchedTranscript), Prisma migration (stitchedTranscript Json?), worker index wiring
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 03-02-PLAN.md — Frontend: Job type extension, shadcn Tabs component, status-view tab layout with Transcript tab rendering ([M:SS] timestamps), status page query fix for DONE jobs
 
 ### Phase 4: Stitched Video Output
 
