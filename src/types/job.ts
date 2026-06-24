@@ -32,6 +32,16 @@ export interface ClipMatch {
 }
 
 /**
+ * A single entry in the stitched transcript, with source video timestamps.
+ * Mirror of worker/src/types.ts StitchedTranscriptEntry — keep in sync.
+ */
+export interface StitchedTranscriptEntry {
+  sourceStartMs: number
+  sourceEndMs: number
+  text: string
+}
+
+/**
  * Client-side Job type — mirrors the Prisma Job model shape for use in
  * components and Server Actions. Timestamps serialised as ISO strings.
  */
@@ -44,6 +54,7 @@ export interface Job {
   errorMessage: string | null
   transcript: TranscriptSegment[] | null
   clipPlan: ClipMatch[] | null
+  stitchedTranscript: StitchedTranscriptEntry[] | null  // Phase 3
   createdAt: string
   updatedAt: string
 }
