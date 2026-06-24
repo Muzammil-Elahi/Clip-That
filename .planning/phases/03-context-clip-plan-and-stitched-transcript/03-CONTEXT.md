@@ -15,16 +15,16 @@ Phase 3 takes the `clipPlan` produced by Phase 2 (array of `ClipMatch` with `sta
 
 ### Context Window Expansion
 - **D-01:** Context window algorithm — **Segment-boundary snapping** (Claude's discretion). Walk outward through the full transcript array from each `ClipMatch`'s outermost `segmentIndex` in both directions until cumulative duration ≥ 30 seconds. The expanded window always starts and ends at a natural transcript segment edge, preventing mid-sentence cuts in both the stitched transcript and the Phase 4 video extraction.
-- **D-02:** Edge clip behavior — **Truncate silently**. When a match is near the video start or end, include whatever segments are available. No annotation or special marker — the source timestamps already reveal that the context window is shorter than 30s.
+- **D-02:** [informational] Edge clip behavior — **Truncate silently**. When a match is near the video start or end, include whatever segments are available. No annotation or special marker — the source timestamps already reveal that the context window is shorter than 30s.
 
 ### Stitched Transcript Shape
-- **D-03:** Entry schema — **`{ sourceStartMs, sourceEndMs, text }`** (Claude's discretion). Minimal and sufficient for STR-03 (source timestamp references). Each entry maps to the source video and is what Phase 4 needs for segment extraction.
-- **D-04:** Storage — **New `stitchedTranscript Json?` column on the `Job` table**, consistent with the existing `transcript` and `clipPlan` pattern. Requires a Prisma migration.
+- **D-03:** [informational] Entry schema — **`{ sourceStartMs, sourceEndMs, text }`** (Claude's discretion). Minimal and sufficient for STR-03 (source timestamp references). Each entry maps to the source video and is what Phase 4 needs for segment extraction.
+- **D-04:** [informational] Storage — **New `stitchedTranscript Json?` column on the `Job` table**, consistent with the existing `transcript` and `clipPlan` pattern. Requires a Prisma migration. (Implemented by the BLOCKING schema migration task in 03-01.)
 - **D-05:** Gap markers — **None**. Non-adjacent context windows are stored sequentially without sentinel entries. Source timestamps on adjacent entries already reveal discontinuities. Simpler to render and store.
 
 ### Result Page Layout
 - **D-06:** Tab container — **Introduce tab layout in Phase 3**: `Video | Transcript | Notes`. The Transcript tab is fully populated in this phase. The Video and Notes tabs are enabled and clickable but show a "coming soon" message (exact copy Claude's discretion — e.g., "Video clips will appear here after Phase 4"). This sets the final result-page layout from the start so Phases 4–5 fill tabs rather than restructure the page.
-- **D-07:** Transcript entry rendering — **Claude's discretion**. Timestamp-plus-text-per-line (`[0:32] text...`) is the expected baseline — readable, no new dependencies, consistent with how transcripts are typically shown.
+- **D-07:** [informational] Transcript entry rendering — **Claude's discretion**. Timestamp-plus-text-per-line (`[0:32] text...`) is the expected baseline — readable, no new dependencies, consistent with how transcripts are typically shown.
 
 ### Zero-Match Display
 - **D-08:** Empty clip plan — When `clipPlan` is empty (topic not found), the `stitchedTranscript` is also empty and the job remains `DONE`. The Transcript tab shows a specific message: `No mentions of "[topic]" were found in this video.` Video and Notes tabs are unaffected.
