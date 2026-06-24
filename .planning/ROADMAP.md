@@ -87,7 +87,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Worker: context-window expansion (expandContextWindows), overlap merging (mergeOverlappingWindows), stitched transcript generation (buildStitchedTranscript), Prisma migration (stitchedTranscript Json?), worker index wiring
+- [x] 03-01-PLAN.md — Worker: context-window expansion (expandContextWindows), overlap merging (mergeOverlappingWindows), stitched transcript generation (buildStitchedTranscript), Prisma migration (stitchedTranscript Json?), worker index wiring
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -160,7 +160,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 |-------|----------------|--------|-----------|
 | 1. Anonymous Job Shell | 3/3 | Complete | 2026-06-13 |
 | 2. Transcript and Exact Search | 2/2 | Complete   | 2026-06-18 |
-| 3. Context Clip Plan and Stitched Transcript | 0/2 | Not started | - |
+| 3. Context Clip Plan and Stitched Transcript | 1/2 | In Progress|  |
 | 4. Stitched Video Output | 0/3 | Not started | - |
 | 5. Study Notes and PDF | 0/2 | Not started | - |
 | 6. Optional Semantic Matching | 0/2 | Not started | - |
