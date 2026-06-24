@@ -1,10 +1,11 @@
 ---
 phase: 3
 slug: context-clip-plan-and-stitched-transcript
-status: draft
+status: approved
 shadcn_initialized: true
 preset: b2fA
 created: 2026-06-23
+reviewed_at: 2026-06-23
 ---
 
 # Phase 3 — UI Design Contract
