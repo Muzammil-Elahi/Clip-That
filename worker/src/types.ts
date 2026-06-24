@@ -23,3 +23,13 @@ export interface ClipMatch {
   text: string             // raw transcript text of matched segment(s)
   segmentIndices: number[] // indices into transcript array (for Phase 3)
 }
+
+/**
+ * A single entry in the stitched transcript, with source video timestamps.
+ * Produced by buildStitchedTranscript() from ExpandedWindow[] in Phase 3.
+ */
+export interface StitchedTranscriptEntry {
+  sourceStartMs: number  // Math.round(segment.offset * 1000)
+  sourceEndMs: number    // Math.round((segment.offset + segment.duration) * 1000)
+  text: string
+}
