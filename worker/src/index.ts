@@ -10,6 +10,8 @@ import { PrismaClient } from '../../prisma/generated/prisma/client'
 import { fetchTranscript, mapTranscriptError } from './transcript.js'
 import { extractYouTubeVideoId } from './youtube.js'
 import { buildClipPlan } from './matcher.js'
+import { expandContextWindows, mergeOverlappingWindows } from './contextExpander.js'
+import { buildStitchedTranscript } from './stitchedTranscript.js'
 import { Prisma } from '../../prisma/generated/prisma/client'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -60,12 +62,18 @@ async function processPendingJob(): Promise<void> {
     const clipPlan = buildClipPlan(segments, job.topic)
     console.log(`  clipPlan: ${clipPlan.length} matches`)
 
+    const expandedWindows = expandContextWindows(segments, clipPlan)
+    const mergedWindows = mergeOverlappingWindows(expandedWindows)
+    const stitchedTranscript = buildStitchedTranscript(segments, mergedWindows)
+    console.log(`  stitchedTranscript: ${stitchedTranscript.length} entries`)
+
     console.log('  writing DONE...')
     await prisma.job.update({
       where: { id: job.id },
       data: {
         transcript: segments as unknown as Prisma.InputJsonValue,
         clipPlan: clipPlan as unknown as Prisma.InputJsonValue,
+        stitchedTranscript: stitchedTranscript as unknown as Prisma.InputJsonValue,
         status: 'DONE',
       },
     })

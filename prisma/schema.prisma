@@ -22,9 +22,10 @@ model Job {
   topic        String
   status       JobStatus @default(PENDING)
   errorMessage String?
-  transcript   Json?
-  clipPlan     Json?
-  createdAt    DateTime  @default(now())
+  transcript         Json?
+  clipPlan           Json?
+  stitchedTranscript Json?     // Phase 3
+  createdAt          DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
   @@index([userId])
