@@ -8,6 +8,9 @@
  * 4. Does NOT render Progress component when initialStatus="FAILED"
  * 5. Renders "Done!" heading when initialStatus="DONE"
  * 6. "Try again" button invokes router.push('/') when clicked
+ * 7. Renders Transcript tab with entries in DONE state (STR-02, STR-03)
+ * 8. Renders empty-state message in Transcript tab when stitchedTranscript is empty (D-08)
+ * 9. Renders three tabs (Video, Transcript, Notes) in DONE state (D-06)
  *
  * Note: Supabase Realtime live subscription is mocked — integration tested manually.
  */
@@ -38,6 +41,8 @@ const baseProps = {
   userId: 'user-123',
   initialJobId: 'job-456',
   initialErrorMessage: null,
+  initialStitchedTranscript: null,
+  topic: 'machine learning',
 }
 
 describe('StatusView', () => {
@@ -113,5 +118,29 @@ describe('StatusView', () => {
 
     expect(mockPush).toHaveBeenCalledWith('/')
     expect(mockPush).toHaveBeenCalledTimes(1)
+  })
+
+  it('renders Transcript tab with entries in DONE state (STR-02, STR-03)', () => {
+    const entries = [
+      { sourceStartMs: 64000, sourceEndMs: 67000, text: 'machine learning is here' },
+    ]
+    render(<StatusView {...baseProps} initialStatus="DONE" initialStitchedTranscript={entries} />)
+
+    expect(screen.getByText('[1:04]')).toBeInTheDocument()
+    expect(screen.getByText('machine learning is here')).toBeInTheDocument()
+  })
+
+  it('renders empty state message in Transcript tab when stitchedTranscript is empty (D-08)', () => {
+    render(<StatusView {...baseProps} initialStatus="DONE" initialStitchedTranscript={[]} />)
+
+    expect(screen.getByText(/No mentions of "machine learning" were found/)).toBeInTheDocument()
+  })
+
+  it('renders three tabs (Video, Transcript, Notes) in DONE state (D-06)', () => {
+    render(<StatusView {...baseProps} initialStatus="DONE" />)
+
+    expect(screen.getByRole('tab', { name: /video/i })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /transcript/i })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument()
   })
 })

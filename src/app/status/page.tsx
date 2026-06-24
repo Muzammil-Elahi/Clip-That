@@ -2,12 +2,13 @@
  * Status page — server component shell.
  *
  * Validates the anonymous user session via getUser() (T-03-02: network-validated,
- * never trusts cookie-only getSession()), then looks up the active job for that
- * user. Redirects to / if no active job is found (empty state redirect) or if
- * no valid user session exists.
+ * never trusts cookie-only getSession()), then looks up the most recent job for that
+ * user (DONE, FAILED, or in-progress) so the result is shown after processing completes.
+ * Redirects to / if no job is found or if no valid user session exists.
  *
  * Security (T-03-04): Job lookup is scoped by userId — no IDOR risk.
  * Security (T-03-02): Uses getUser() not getSession() (RESEARCH Pitfall 6).
+ * Security (T-03-05): Query scoped by userId=user.id — IDOR prevention; RLS enforced on Job table.
  */
 export const dynamic = 'force-dynamic'
 
@@ -15,6 +16,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import StatusView from '@/components/status-view'
+import type { StitchedTranscriptEntry } from '@/types/job'
 
 export default async function StatusPage() {
   // Validate session using network-validated getUser() (T-03-02)
@@ -27,20 +29,15 @@ export default async function StatusPage() {
     redirect('/')
   }
 
-  // Look up the active job for this user (T-03-04: scoped to userId)
+  // Look up the most recent job for this user (DONE, FAILED, or in-progress) so the result
+  // is shown after processing completes (fixes DONE-job display bug — RESEARCH.md Pitfall 1).
+  // Security (T-03-05): scoped by userId — no IDOR risk.
   const job = await prisma.job.findFirst({
-    where: {
-      userId: user.id,
-      status: {
-        notIn: ['DONE', 'FAILED'],
-      },
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
+    where: { userId: user.id },
+    orderBy: { createdAt: 'desc' },
   })
 
-  // Empty state — no active job in progress
+  // Empty state — no job found for this user
   if (!job) {
     return (
       <main className="min-h-screen flex items-center justify-center px-4 bg-background">
@@ -63,6 +60,8 @@ export default async function StatusPage() {
         initialStatus={job.status}
         initialJobId={job.id}
         initialErrorMessage={job.errorMessage ?? null}
+        initialStitchedTranscript={(job.stitchedTranscript as StitchedTranscriptEntry[] | null) ?? null}
+        topic={job.topic}
       />
     </main>
   )
