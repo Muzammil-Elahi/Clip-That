@@ -77,7 +77,7 @@ export function mergeOverlappingWindows(windows: ExpandedWindow[]): ExpandedWind
     if (curr.startMs <= last.endMs) {
       // Overlapping or adjacent — extend the last window
       merged[merged.length - 1] = {
-        startIdx: last.startIdx,
+        startIdx: Math.min(last.startIdx, curr.startIdx),
         endIdx: Math.max(last.endIdx, curr.endIdx),
         startMs: last.startMs,
         endMs: Math.max(last.endMs, curr.endMs),

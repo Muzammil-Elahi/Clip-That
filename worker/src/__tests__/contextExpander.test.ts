@@ -173,4 +173,20 @@ describe('mergeOverlappingWindows', () => {
     expect(result[0].startMs).toBe(0)
     expect(result[1].startMs).toBe(40000)
   })
+
+  it('takes minimum startIdx when startMs order differs from startIdx order (WR-03)', () => {
+    // Window A: startMs=0, startIdx=5 (e.g. floating-point shifted boundary)
+    // Window B: startMs=20000, startIdx=2 (lower index but later startMs)
+    // They overlap; merged result must use startIdx=2 (the minimum), not startIdx=5
+    const windows = [
+      { startIdx: 5, endIdx: 10, startMs: 0, endMs: 30000 },
+      { startIdx: 2, endIdx: 12, startMs: 20000, endMs: 50000 }, // overlaps, but lower startIdx
+    ]
+    const result = mergeOverlappingWindows(windows)
+    expect(result).toHaveLength(1)
+    expect(result[0].startIdx).toBe(2)  // minimum, not 5
+    expect(result[0].endIdx).toBe(12)
+    expect(result[0].startMs).toBe(0)
+    expect(result[0].endMs).toBe(50000)
+  })
 })
