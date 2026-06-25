@@ -44,12 +44,12 @@ async function processPendingJob(): Promise<void> {
   if (!job) { process.stdout.write('no pending jobs. '); return }
   console.log(`\nPicked up job ${job.id} (${job.youtubeUrl}, topic: "${job.topic}")`)
 
+  processingJob = true
   await prisma.job.update({
     where: { id: job.id },
     data: { status: 'PROCESSING' },
   })
 
-  processingJob = true
   try {
     const videoId = extractYouTubeVideoId(job.youtubeUrl)
     if (!videoId) throw new Error('Invalid YouTube URL')
