@@ -31,9 +31,9 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Clip Planning
 
 - [ ] **CLP-01**: System can create a clip plan from all relevant transcript segments.
-- [ ] **CLP-02**: System can add surrounding context around each relevant segment, defaulting to approximately 30 seconds before and after where available.
-- [ ] **CLP-03**: System can merge overlapping context windows before video processing.
-- [ ] **CLP-04**: System can preserve source timestamps for every planned segment.
+- [x] **CLP-02**: System can add surrounding context around each relevant segment, defaulting to approximately 30 seconds before and after where available.
+- [x] **CLP-03**: System can merge overlapping context windows before video processing.
+- [x] **CLP-04**: System can preserve source timestamps for every planned segment.
 
 ### Video Output
 
@@ -44,9 +44,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Stitched Transcript
 
-- [ ] **STR-01**: System can generate a transcript for the stitched video.
-- [ ] **STR-02**: User can view the stitched transcript alongside the stitched video.
-- [ ] **STR-03**: Stitched transcript entries can reference their original source timestamps.
+- [x] **STR-01**: System can generate a transcript for the stitched video.
+- [x] **STR-02**: User can view the stitched transcript alongside the stitched video.
+- [x] **STR-03**: Stitched transcript entries can reference their original source timestamps.
 
 ### Study Notes
 
@@ -120,16 +120,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MAT-03 | Phase 6 | Pending |
 | MAT-04 | Phase 6 | Pending |
 | CLP-01 | Phase 2 | Pending |
-| CLP-02 | Phase 3 | Pending |
-| CLP-03 | Phase 3 | Pending |
-| CLP-04 | Phase 3 | Pending |
+| CLP-02 | Phase 3 | Complete |
+| CLP-03 | Phase 3 | Complete |
+| CLP-04 | Phase 3 | Complete |
 | VID-01 | Phase 4 | Pending |
 | VID-02 | Phase 4 | Pending |
 | VID-03 | Phase 4 | Pending |
 | VID-04 | Phase 4 | Pending |
-| STR-01 | Phase 3 | Pending |
-| STR-02 | Phase 3 | Pending |
-| STR-03 | Phase 3 | Pending |
+| STR-01 | Phase 3 | Complete |
+| STR-02 | Phase 3 | Complete |
+| STR-03 | Phase 3 | Complete |
 | NOT-01 | Phase 5 | Pending |
 | NOT-02 | Phase 5 | Pending |
 | NOT-03 | Phase 5 | Pending |
