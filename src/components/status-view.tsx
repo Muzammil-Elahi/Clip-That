@@ -11,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import type { StitchedTranscriptEntry } from '@/types/job'
 import { cn } from '@/lib/utils'
+import { parseStitchedTranscript } from '@/lib/parseStitchedTranscript'
 
 /**
  * Rotating status messages shown while the job is PENDING or PROCESSING.
@@ -132,7 +133,7 @@ export default function StatusView({
         const row = data as any
         setStatus(row.status)
         setErrorMessage(row.errorMessage ?? null)
-        setStitchedTranscript((row.stitchedTranscript as StitchedTranscriptEntry[] | null) ?? null)
+        setStitchedTranscript(parseStitchedTranscript(row.stitchedTranscript))
       }
     }, 3000)
 
@@ -230,9 +231,7 @@ export default function StatusView({
             </TabsList>
             <TabsContent value="video">
               <p className="text-base text-muted-foreground">
-                {(stitchedTranscript?.length ?? 0) === 0
-                  ? `No mentions of "${topic}" were found in this video, so there are no video clips to show.`
-                  : 'Video clips will be available here once processing is complete.'}
+                Video clips will be available here once processing is complete.
               </p>
             </TabsContent>
             <TabsContent value="transcript">
@@ -242,8 +241,8 @@ export default function StatusView({
                     No mentions of &quot;{topic}&quot; were found in this video.
                   </p>
                 ) : (
-                  stitchedTranscript!.map((entry, i) => (
-                    <div key={i} className="flex gap-2 items-baseline">
+                  stitchedTranscript!.map((entry) => (
+                    <div key={entry.sourceStartMs} className="flex gap-2 items-baseline">
                       <span className="text-sm font-semibold text-foreground shrink-0">
                         {formatTimestamp(entry.sourceStartMs)}
                       </span>
@@ -255,9 +254,7 @@ export default function StatusView({
             </TabsContent>
             <TabsContent value="notes">
               <p className="text-base text-muted-foreground">
-                {(stitchedTranscript?.length ?? 0) === 0
-                  ? `No mentions of "${topic}" were found in this video, so there are no notes to generate.`
-                  : 'Study notes will appear here in a future update.'}
+                Study notes will appear here in a future update.
               </p>
             </TabsContent>
           </Tabs>

@@ -16,7 +16,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import StatusView from '@/components/status-view'
-import type { StitchedTranscriptEntry } from '@/types/job'
+import { parseStitchedTranscript } from '@/lib/parseStitchedTranscript'
 
 export default async function StatusPage() {
   // Validate session using network-validated getUser() (T-03-02)
@@ -60,7 +60,7 @@ export default async function StatusPage() {
         initialStatus={job.status}
         initialJobId={job.id}
         initialErrorMessage={job.errorMessage ?? null}
-        initialStitchedTranscript={(job.stitchedTranscript as StitchedTranscriptEntry[] | null) ?? null}
+        initialStitchedTranscript={parseStitchedTranscript(job.stitchedTranscript)}
         topic={job.topic}
       />
     </main>
