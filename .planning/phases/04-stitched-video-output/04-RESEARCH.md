@@ -640,22 +640,22 @@ model Job {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **CORS on Supabase Storage bucket**
    - What we know: Browsers enforce CORS on video src attributes for cross-origin playback.
    - What's unclear: Whether Supabase Storage's default CORS config allows the Next.js app origin.
-   - Recommendation: In VERIFICATION.md, add a manual test that the `<video>` actually plays from a signed URL; configure CORS in Supabase Storage settings if needed (`allowed_origins: [app domain]`).
+   - **RESOLVED:** Document CORS configuration as a manual setup step in `04-VALIDATION.md`. If `<video>` fails to load, configure CORS in Supabase Storage settings to allow the app origin. Accepted risk — MVP only; CORS config is a one-time dashboard action, not a code change.
 
 2. **Railway disk space for temp files**
    - What we know: Railway free tier containers have limited disk (`/tmp` is typically ephemeral with a few GB).
    - What's unclear: Exact disk limit on Railway free tier; whether a 1-hour 720p YouTube video (~500MB) fits.
-   - Recommendation: Add a size check in `downloadYouTubeVideo()` or rely on Railway's OOM kill as a natural throttle; document in VERIFICATION.md.
+   - **RESOLVED:** Accept risk for MVP — download to `/tmp` via streaming (not loading into memory). Railway free tier typically provides 1–2 GB of ephemeral disk; a 720p 1-hour video is ~500 MB, which fits. Known limitation: very long or high-bitrate videos may fail. Document in `04-VALIDATION.md` as a known limitation. No code change required.
 
 3. **ytdl-core format availability for arbitrary YouTube videos**
    - What we know: Most YouTube videos have a combined `videoandaudio` mp4 format below 720p. 1080p+ separates audio and video streams (requires merging).
    - What's unclear: Whether the filter `container === 'mp4' && hasVideo && hasAudio` always finds a format, or whether some videos (e.g., 4K-only) require separate streams + FFmpeg merge.
-   - Recommendation: Add a fallback: if no combined mp4 format, fall back to `quality: 'lowest'` combined format. Log a warning for 1080p-only videos. For MVP, 720p combined is acceptable.
+   - **RESOLVED:** Add a fallback in `videoDownloader.ts`: if no combined mp4 format is found with the primary filter, retry with `quality: 'lowestvideo'` combined format (removes container constraint). For MVP, 720p combined is acceptable. 4K-only videos may fail with a clear error message. Planner should add this fallback to the `videoDownloader.ts` action.
 
 ---
 

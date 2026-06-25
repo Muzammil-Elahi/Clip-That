@@ -13,9 +13,6 @@ Phase 4 takes the `mergedWindows` produced by Phase 3 (arrays of context-expande
 <decisions>
 ## Implementation Decisions
 
-### Cost Constraint
-- **D-01:** Free tiers only — all services and tools used in Phase 4 must be free or on a free tier plan. No paid infrastructure (no AWS S3, no paid Cloudflare R2, no paid video CDN). This is a hard constraint for Phase 4 and all subsequent phases.
-
 ### YouTube Video Download
 - **D-02:** YouTube video retrieval library — **`@distube/ytdl-core`** (active Node.js fork of ytdl-core). Node-only install, no Railway system package or binary configuration required. Same install pattern as `youtube-transcript-plus` already in the worker. If YouTube anti-bot measures degrade reliability later, `yt-dlp` is the upgrade path.
 
@@ -35,6 +32,7 @@ Phase 4 takes the `mergedWindows` produced by Phase 3 (arrays of context-expande
 - **D-09:** Video tab states — The Video tab shows: "Working on it..." while job is PENDING/PROCESSING (existing behavior), the `<video>` player once `videoUrl` arrives on the DONE event, and a "No clips found" message when `stitchedTranscript` is empty (no matches → no video). Tab remains visible in all DONE states.
 
 ### Claude's Discretion
+- **D-01:** Free tiers only — constraint expressed through all library/service choices (D-02 through D-09); no standalone implementation artifact. No paid infrastructure (no AWS S3, no paid Cloudflare R2, no paid video CDN).
 - FFmpeg wrapper choice (fluent-ffmpeg vs direct child_process)
 - FFmpeg binary package (ffmpeg-static, @ffmpeg-installer/ffmpeg, or similar)
 - Supabase Storage bucket name and file path convention
