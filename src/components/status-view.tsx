@@ -203,7 +203,9 @@ export default function StatusView({
             </TabsList>
             <TabsContent value="video">
               <p className="text-base text-muted-foreground">
-                Video clips will be available here once processing is complete.
+                {(stitchedTranscript?.length ?? 0) === 0
+                  ? `No mentions of "${topic}" were found in this video, so there are no video clips to show.`
+                  : 'Video clips will be available here once processing is complete.'}
               </p>
             </TabsContent>
             <TabsContent value="transcript">
@@ -226,7 +228,9 @@ export default function StatusView({
             </TabsContent>
             <TabsContent value="notes">
               <p className="text-base text-muted-foreground">
-                Study notes will appear here in a future update.
+                {(stitchedTranscript?.length ?? 0) === 0
+                  ? `No mentions of "${topic}" were found in this video, so there are no notes to generate.`
+                  : 'Study notes will appear here in a future update.'}
               </p>
             </TabsContent>
           </Tabs>
