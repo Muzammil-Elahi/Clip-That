@@ -105,13 +105,17 @@ Plans:
   2. System stitches extracted segments into one continuous playable video.
   3. Anonymous video artifacts expire after a configured retention window.
 
-**Plans**: 3 plans
+**Plans**: 2 plans
 
 Plans:
 
-- [ ] 04-01: Implement media range retrieval and FFmpeg segment extraction.
-- [ ] 04-02: Implement stitched video rendering and browser playback.
-- [ ] 04-03: Implement temporary artifact storage, serving, and cleanup.
+**Wave 1**
+
+- [ ] 04-01-PLAN.md — Worker video pipeline: schema migration (videoUrl, videoExpiresAt), install ffmpeg-static + @distube/ytdl-core, videoDownloader + videoExtractor + videoStitcher + storageUploader + videoCleanup modules, worker index wiring (VID-01, VID-02, VID-04, JOB-03)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 04-02-PLAN.md — Frontend Video tab: Job type extension, StatusViewProps + videoUrl state, Realtime handler + polling fallback extended, conditional <video> player in Video tab, status page initialVideoUrl prop (VID-03)
 
 ### Phase 5: Study Notes and PDF
 
@@ -161,6 +165,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 1. Anonymous Job Shell | 3/3 | Complete | 2026-06-13 |
 | 2. Transcript and Exact Search | 2/2 | Complete   | 2026-06-18 |
 | 3. Context Clip Plan and Stitched Transcript | 2/2 | Complete    | 2026-06-25 |
-| 4. Stitched Video Output | 0/3 | Not started | - |
+| 4. Stitched Video Output | 0/2 | Not started | - |
 | 5. Study Notes and PDF | 0/2 | Not started | - |
 | 6. Optional Semantic Matching | 0/2 | Not started | - |
