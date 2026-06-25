@@ -16,8 +16,8 @@ export function buildStitchedTranscript(
   mergedWindows: ExpandedWindow[],
 ): StitchedTranscriptEntry[] {
   const entries: StitchedTranscriptEntry[] = []
-  for (const window of mergedWindows) {
-    for (let i = window.startIdx; i <= window.endIdx; i++) {
+  for (const span of mergedWindows) {
+    for (let i = span.startIdx; i <= span.endIdx; i++) {
       const seg = segments[i]
       entries.push({
         sourceStartMs: Math.round(seg.offset * 1000),
