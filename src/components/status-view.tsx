@@ -112,6 +112,33 @@ export default function StatusView({
     }
   }, [initialJobId])
 
+  // Polling fallback — queries job status every 3 s while active so the UI
+  // transitions even when Realtime events are not delivered (e.g. connection
+  // race, RLS misconfiguration). Stops automatically once the job is terminal.
+  useEffect(() => {
+    const isActive = status === JobStatus.PENDING || status === JobStatus.PROCESSING
+    if (!isActive) return
+
+    const supabase = createClient()
+    const interval = setInterval(async () => {
+      const { data } = await supabase
+        .from('Job')
+        .select('status, errorMessage, stitchedTranscript')
+        .eq('id', initialJobId)
+        .single()
+
+      if (data) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const row = data as any
+        setStatus(row.status)
+        setErrorMessage(row.errorMessage ?? null)
+        setStitchedTranscript((row.stitchedTranscript as StitchedTranscriptEntry[] | null) ?? null)
+      }
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [status, initialJobId])
+
   // Progress animation — drives the progress bar from 10% toward 90% during
   // PENDING/PROCESSING, then snaps to 100% when DONE
   useEffect(() => {
