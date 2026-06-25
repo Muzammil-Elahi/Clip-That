@@ -97,6 +97,20 @@ describe('expandContextWindows', () => {
     // startMs from leftmost segment offset
     expect(result[0].startMs).toBe(Math.round(segments[result[0].startIdx].offset * 1000))
   })
+
+  it('skips ClipMatch with empty segmentIndices without throwing (CR-01)', () => {
+    const segments: TranscriptSegment[] = [{ text: 'a', offset: 0, duration: 5, lang: 'en' }]
+    const matches: ClipMatch[] = [{ startMs: 0, endMs: 5000, text: 'a', segmentIndices: [] }]
+    expect(() => expandContextWindows(segments, matches)).not.toThrow()
+    expect(expandContextWindows(segments, matches)).toEqual([])
+  })
+
+  it('returns empty array when segments is empty but matches are non-empty (CR-02)', () => {
+    const segments: TranscriptSegment[] = []
+    const matches: ClipMatch[] = [{ startMs: 0, endMs: 5000, text: 'a', segmentIndices: [0] }]
+    expect(() => expandContextWindows(segments, matches)).not.toThrow()
+    expect(expandContextWindows(segments, matches)).toEqual([])
+  })
 })
 
 describe('mergeOverlappingWindows', () => {

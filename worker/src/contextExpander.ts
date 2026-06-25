@@ -29,7 +29,9 @@ export function expandContextWindows(
   matches: ClipMatch[],
   contextMs = CONTEXT_WINDOW_MS,
 ): ExpandedWindow[] {
+  if (segments.length === 0) return []
   return matches.map(match => {
+    if (match.segmentIndices.length === 0) return null
     const innerStart = Math.min(...match.segmentIndices)
     const innerEnd   = Math.max(...match.segmentIndices)
 
@@ -55,7 +57,7 @@ export function expandContextWindows(
       startMs: Math.round(segments[leftIdx].offset * 1000),
       endMs: Math.round((segments[rightIdx].offset + segments[rightIdx].duration) * 1000),
     }
-  })
+  }).filter((w): w is ExpandedWindow => w !== null)
 }
 
 /**
