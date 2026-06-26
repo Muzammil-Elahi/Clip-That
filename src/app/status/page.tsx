@@ -61,6 +61,7 @@ export default async function StatusPage() {
         initialJobId={job.id}
         initialErrorMessage={job.errorMessage ?? null}
         initialStitchedTranscript={parseStitchedTranscript(job.stitchedTranscript)}
+        initialVideoUrl={job.videoUrl ?? null}
         topic={job.topic}
       />
     </main>

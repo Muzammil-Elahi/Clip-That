@@ -54,6 +54,7 @@ const baseProps = {
   initialJobId: 'job-456',
   initialErrorMessage: null,
   initialStitchedTranscript: null,
+  initialVideoUrl: null,
   topic: 'machine learning',
 }
 
@@ -156,16 +157,22 @@ describe('StatusView', () => {
     expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument()
   })
 
-  it('Video tab shows spec-defined copy when DONE (WR-02)', () => {
-    render(<StatusView {...baseProps} initialStatus="DONE" initialStitchedTranscript={[]} />)
+  it('Video tab shows "No clips found for..." when DONE with empty transcript and no videoUrl (D-09)', () => {
+    render(<StatusView {...baseProps} initialStatus="DONE" initialStitchedTranscript={[]} initialVideoUrl={null} />)
+
+    // base-ui Tabs unmounts inactive panels — click Video tab to activate it
+    fireEvent.click(screen.getByRole('tab', { name: /video/i }))
 
     expect(
-      screen.getByText('Video clips will be available here once processing is complete.')
+      screen.getByText(/No clips found for "machine learning"\./)
     ).toBeInTheDocument()
   })
 
   it('Notes tab shows spec-defined copy when DONE (WR-02)', () => {
     render(<StatusView {...baseProps} initialStatus="DONE" />)
+
+    // base-ui Tabs unmounts inactive panels — click Notes tab to activate it
+    fireEvent.click(screen.getByRole('tab', { name: /notes/i }))
 
     expect(
       screen.getByText('Study notes will appear here in a future update.')

@@ -41,6 +41,7 @@ interface StatusViewProps {
   initialJobId: string
   initialErrorMessage: string | null
   initialStitchedTranscript: StitchedTranscriptEntry[] | null  // Phase 3
+  initialVideoUrl: string | null                                // Phase 4: D-08
   topic: string                                                 // Phase 3
 }
 
@@ -63,6 +64,7 @@ export default function StatusView({
   initialJobId,
   initialErrorMessage,
   initialStitchedTranscript,
+  initialVideoUrl,
   topic,
 }: StatusViewProps) {
   const router = useRouter()
@@ -73,6 +75,7 @@ export default function StatusView({
   const [stitchedTranscript, setStitchedTranscript] = useState<StitchedTranscriptEntry[] | null>(
     initialStitchedTranscript
   )
+  const [videoUrl, setVideoUrl] = useState<string | null>(initialVideoUrl ?? null)  // Phase 4
   const [messageIndex, setMessageIndex] = useState(0)
   const [progress, setProgress] = useState(() => {
     if (initialStatus === JobStatus.DONE) return 100
@@ -104,6 +107,7 @@ export default function StatusView({
           setStatus(payload.new.status)
           setErrorMessage(payload.new.errorMessage ?? null)
           setStitchedTranscript(payload.new.stitchedTranscript ?? null)
+          setVideoUrl(payload.new.videoUrl ?? null)    // Phase 4
         }
       )
       .subscribe()
@@ -124,7 +128,7 @@ export default function StatusView({
     const interval = setInterval(async () => {
       const { data } = await supabase
         .from('Job')
-        .select('status, errorMessage, stitchedTranscript')
+        .select('status, errorMessage, stitchedTranscript, videoUrl')
         .eq('id', initialJobId)
         .single()
 
@@ -134,6 +138,7 @@ export default function StatusView({
         setStatus(row.status)
         setErrorMessage(row.errorMessage ?? null)
         setStitchedTranscript(parseStitchedTranscript(row.stitchedTranscript))
+        setVideoUrl(row.videoUrl ?? null)    // Phase 4
       }
     }, 3000)
 
@@ -230,9 +235,21 @@ export default function StatusView({
               <TabsTrigger value="notes">Notes</TabsTrigger>
             </TabsList>
             <TabsContent value="video">
-              <p className="text-base text-muted-foreground">
-                Video clips will be available here once processing is complete.
-              </p>
+              {!videoUrl && (stitchedTranscript?.length ?? 0) === 0 ? (
+                <p className="text-base text-muted-foreground">
+                  No clips found for &quot;{topic}&quot;.
+                </p>
+              ) : videoUrl ? (
+                <video
+                  controls
+                  src={videoUrl}
+                  className="w-full rounded-md"
+                />
+              ) : (
+                <p className="text-base text-muted-foreground">
+                  Working on it...
+                </p>
+              )}
             </TabsContent>
             <TabsContent value="transcript">
               <div className="flex flex-col gap-2">

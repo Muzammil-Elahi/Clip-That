@@ -6,11 +6,11 @@
  * 2. Renders "Working on it..." in Video tab when videoUrl is null and stitchedTranscript is non-empty (D-09)
  * 3. Renders "No clips found for..." in Video tab when videoUrl is null and stitchedTranscript is empty (D-09)
  *
- * RED phase: these tests FAIL until StatusView accepts initialVideoUrl prop and renders
- * the conditional <video> player.
+ * Note: base-ui Tabs unmounts inactive panels from the DOM by default (keepMounted=false).
+ * Each test clicks the Video tab button to activate the panel before asserting content.
  */
 
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import StatusView from '@/components/status-view'
 
@@ -45,6 +45,12 @@ const defaultProps = {
   topic: 'photosynthesis',
 }
 
+/** Click the Video tab button to make the Video tab panel active in the DOM. */
+function clickVideoTab() {
+  const videoTabBtn = screen.getByRole('tab', { name: /video/i })
+  fireEvent.click(videoTabBtn)
+}
+
 describe('StatusView — Video tab states', () => {
   it('renders <video> with correct src when videoUrl is set', () => {
     render(
@@ -54,6 +60,8 @@ describe('StatusView — Video tab states', () => {
       />
     )
 
+    clickVideoTab()
+
     const videoEl = document.querySelector('video')
     expect(videoEl).not.toBeNull()
     expect(videoEl?.getAttribute('src')).toContain('https://example.com/signed.mp4')
@@ -62,12 +70,10 @@ describe('StatusView — Video tab states', () => {
   it('renders "Working on it..." in Video tab when videoUrl is null and matches exist', () => {
     render(<StatusView {...defaultProps} initialVideoUrl={null} />)
 
-    // The Video tab content should show "Working on it..."
-    // Note: the heading also says "Done!" so we look for this text in context
-    // stitchedTranscript is non-empty, videoUrl is null → "Working on it..."
-    const elements = screen.getAllByText('Working on it...')
-    // At minimum one instance should be in the Video tab content
-    expect(elements.length).toBeGreaterThan(0)
+    clickVideoTab()
+
+    // stitchedTranscript is non-empty, videoUrl is null → Video tab shows "Working on it..."
+    expect(screen.getByText('Working on it...')).toBeInTheDocument()
   })
 
   it('renders "No clips found" message when videoUrl is null and stitchedTranscript is empty', () => {
@@ -78,6 +84,8 @@ describe('StatusView — Video tab states', () => {
         initialVideoUrl={null}
       />
     )
+
+    clickVideoTab()
 
     expect(screen.getByText(/No clips found for/)).toBeInTheDocument()
   })
