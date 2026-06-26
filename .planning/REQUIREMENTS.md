@@ -37,10 +37,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Video Output
 
-- [ ] **VID-01**: System can extract planned video segments from the source YouTube video.
-- [ ] **VID-02**: System can stitch all planned segments into one continuous video.
+- [x] **VID-01**: System can extract planned video segments from the source YouTube video.
+- [x] **VID-02**: System can stitch all planned segments into one continuous video.
 - [ ] **VID-03**: User can play the stitched video in the browser.
-- [ ] **VID-04**: System can avoid storing processed video artifacts permanently.
+- [x] **VID-04**: System can avoid storing processed video artifacts permanently.
 
 ### Stitched Transcript
 
@@ -60,7 +60,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **JOB-01**: User can see processing status after submitting a job.
 - [x] **JOB-02**: User can see a clear failure state if transcript retrieval, matching, media processing, or note generation fails.
-- [ ] **JOB-03**: System can expire anonymous job artifacts after a configured retention window.
+- [x] **JOB-03**: System can expire anonymous job artifacts after a configured retention window.
 
 ## v2 Requirements
 
@@ -123,10 +123,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CLP-02 | Phase 3 | Complete |
 | CLP-03 | Phase 3 | Complete |
 | CLP-04 | Phase 3 | Complete |
-| VID-01 | Phase 4 | Pending |
-| VID-02 | Phase 4 | Pending |
+| VID-01 | Phase 4 | Complete |
+| VID-02 | Phase 4 | Complete |
 | VID-03 | Phase 4 | Pending |
-| VID-04 | Phase 4 | Pending |
+| VID-04 | Phase 4 | Complete |
 | STR-01 | Phase 3 | Complete |
 | STR-02 | Phase 3 | Complete |
 | STR-03 | Phase 3 | Complete |
@@ -137,7 +137,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NOT-05 | Phase 5 | Pending |
 | JOB-01 | Phase 1 | Complete |
 | JOB-02 | Phase 1 | Complete |
-| JOB-03 | Phase 4 | Pending |
+| JOB-03 | Phase 4 | Complete |
 
 **Coverage:**
 

@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 04 context gathered
-last_updated: "2026-06-25T22:37:06.716Z"
-last_activity: 2026-06-25 -- Phase 04 planning complete
+last_updated: "2026-06-26T02:41:38.159Z"
+last_activity: 2026-06-26 -- Phase 04 execution started
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
-  percent: 50
+  total_plans: 9
+  completed_plans: 8
+  percent: 89
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-07)
 
 **Core value:** Students can turn a long video into a focused study artifact for a specific topic without rewatching the whole video.
-**Current focus:** Phase 03 — context-clip-plan-and-stitched-transcript
+**Current focus:** Phase 04 — stitched-video-output
 
 ## Current Position
 
-Phase: 4
-Plan: Not started
+Phase: 04 (stitched-video-output) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-06-25 -- Phase 04 planning complete
+Last activity: 2026-06-26 -- Phase 04 execution started
 
 Progress: [████████░░] 100% (Phase 01)
 
@@ -79,6 +79,11 @@ Recent decisions affecting current work:
 - Supabase Realtime: postgres_changes subscription on Job table filtered to userId=eq.<uid>; channel cleanup on unmount (01-03).
 - Heading deduplication: aria-live h1 omitted on FAILED state; AlertTitle carries the heading to avoid duplicate text in DOM (01-03).
 - fireEvent used over userEvent — @testing-library/user-event not installed; fireEvent from @testing-library/react sufficient for click tests (01-03).
+- ffmpeg-static + direct child_process.spawn selected for FFmpeg (no fluent-ffmpeg — deprecated npm 2024) (04-01).
+- @distube/ytdl-core@4.16.12 installed in worker; archived Aug 2025; yt-dlp is the upgrade path per D-02 (04-01).
+- supabaseAdmin client created at worker module load time; service role key is worker-only, never in NEXT_PUBLIC_ vars (04-01).
+- Video pipeline guarded by mergedWindows.length > 0; videoUrl=null when no topic matches found (04-01).
+- Supabase Storage bucket 'clip-videos', SUPABASE_SERVICE_ROLE_KEY, and SUPABASE_URL must be set before first job runs (04-01).
 
 ### Pending Todos
 
@@ -100,6 +105,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-25T22:03:24.284Z
-Stopped at: Phase 04 context gathered
-Resume file: .planning/phases/04-stitched-video-output/04-CONTEXT.md
+Last session: 2026-06-26T02:41:38.143Z
+Stopped at: Completed 04-01-PLAN.md — worker video pipeline
+Resume file: .planning/phases/04-stitched-video-output/04-02-PLAN.md

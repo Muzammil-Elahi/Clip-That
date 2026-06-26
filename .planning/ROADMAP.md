@@ -111,7 +111,7 @@ Plans:
 
 **Wave 1**
 
-- [ ] 04-01-PLAN.md — Worker video pipeline: schema migration (videoUrl, videoExpiresAt), install ffmpeg-static + @distube/ytdl-core, videoDownloader + videoExtractor + videoStitcher + storageUploader + videoCleanup modules, worker index wiring (VID-01, VID-02, VID-04, JOB-03)
+- [x] 04-01-PLAN.md — Worker video pipeline: schema migration (videoUrl, videoExpiresAt), install ffmpeg-static + @distube/ytdl-core, videoDownloader + videoExtractor + videoStitcher + storageUploader + videoCleanup modules, worker index wiring (VID-01, VID-02, VID-04, JOB-03)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -165,6 +165,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 1. Anonymous Job Shell | 3/3 | Complete | 2026-06-13 |
 | 2. Transcript and Exact Search | 2/2 | Complete   | 2026-06-18 |
 | 3. Context Clip Plan and Stitched Transcript | 2/2 | Complete    | 2026-06-25 |
-| 4. Stitched Video Output | 0/2 | Not started | - |
+| 4. Stitched Video Output | 1/2 | In Progress|  |
 | 5. Study Notes and PDF | 0/2 | Not started | - |
 | 6. Optional Semantic Matching | 0/2 | Not started | - |
