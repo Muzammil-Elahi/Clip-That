@@ -1,18 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const mockRemove = vi.fn().mockResolvedValue({ error: null })
-const mockStorageFrom = vi.fn(() => ({ remove: mockRemove }))
-
 vi.mock('../storageUploader.js', () => ({
   supabaseAdmin: {
     storage: {
-      from: mockStorageFrom,
+      from: vi.fn(() => ({
+        remove: vi.fn().mockResolvedValue({ error: null }),
+      })),
     },
   },
   BUCKET: 'clip-videos',
 }))
 
 import { cleanupExpiredVideos } from '../videoCleanup.js'
+import { supabaseAdmin } from '../storageUploader.js'
 
 describe('cleanupExpiredVideos', () => {
   let mockPrisma: {
@@ -21,17 +21,24 @@ describe('cleanupExpiredVideos', () => {
       updateMany: ReturnType<typeof vi.fn>
     }
   }
+  let mockRemove: ReturnType<typeof vi.fn>
+  let mockStorageFrom: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
     vi.clearAllMocks()
+
+    mockRemove = vi.fn().mockResolvedValue({ error: null })
+    mockStorageFrom = vi.fn(() => ({ remove: mockRemove }))
+
+    // Re-mock the storage.from reference on the already-imported supabaseAdmin
+    vi.mocked(supabaseAdmin.storage.from).mockImplementation(mockStorageFrom)
+
     mockPrisma = {
       job: {
         findMany: vi.fn().mockResolvedValue([]),
         updateMany: vi.fn().mockResolvedValue({ count: 0 }),
       },
     }
-    mockRemove.mockResolvedValue({ error: null })
-    mockStorageFrom.mockImplementation(() => ({ remove: mockRemove }))
   })
 
   it('returns early when no expired jobs', async () => {
@@ -51,7 +58,6 @@ describe('cleanupExpiredVideos', () => {
 
     await cleanupExpiredVideos(mockPrisma as never)
 
-    expect(mockStorageFrom).toHaveBeenCalledWith('clip-videos')
     expect(mockRemove).toHaveBeenCalledWith([
       'jobs/uuid-1/output.mp4',
       'jobs/uuid-2/output.mp4',

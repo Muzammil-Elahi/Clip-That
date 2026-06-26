@@ -13,6 +13,14 @@ import { buildClipPlan } from './matcher.js'
 import { expandContextWindows, mergeOverlappingWindows } from './contextExpander.js'
 import { buildStitchedTranscript } from './stitchedTranscript.js'
 import { Prisma } from '../../prisma/generated/prisma/client'
+import { downloadYouTubeVideo, mapVideoError } from './videoDownloader.js'
+import { extractSegments } from './videoExtractor.js'
+import { stitchSegments } from './videoStitcher.js'
+import { uploadVideoAndGetUrl, RETENTION_MS } from './storageUploader.js'
+import { cleanupExpiredVideos } from './videoCleanup.js'
+import { mkdir, rm } from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 config({ path: resolve(__dirname, '../../.env.local') })
@@ -28,6 +36,24 @@ const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
 const sleep = (ms: number) => new Promise<void>(res => setTimeout(res, ms))
+
+/**
+ * Creates a job-scoped temp directory, runs fn with its path, and always removes it.
+ * The finally block guarantees cleanup even if an error is thrown inside fn.
+ * Per RESEARCH.md Pattern 5.
+ */
+async function withTempDir<T>(
+  jobId: string,
+  fn: (tmpDir: string) => Promise<T>,
+): Promise<T> {
+  const tmpDir = path.join(os.tmpdir(), `clip-that-${jobId}`)
+  await mkdir(tmpDir, { recursive: true })
+  try {
+    return await fn(tmpDir)
+  } finally {
+    await rm(tmpDir, { recursive: true, force: true })
+  }
+}
 
 let shutdown = false
 let processingJob = false
@@ -67,6 +93,27 @@ async function processPendingJob(): Promise<void> {
     const stitchedTranscript = buildStitchedTranscript(segments, mergedWindows)
     console.log(`  stitchedTranscript: ${stitchedTranscript.length} entries`)
 
+    // Phase 4: video pipeline — download, extract, stitch, upload
+    let videoUrl: string | null = null
+    if (mergedWindows.length > 0) {
+      videoUrl = await withTempDir(job.id, async (tmpDir) => {
+        const sourceFile = path.join(tmpDir, 'source.mp4')
+        const outputFile = path.join(tmpDir, 'output.mp4')
+
+        console.log('  downloading source video...')
+        await downloadYouTubeVideo(`https://www.youtube.com/watch?v=${videoId}`, sourceFile)
+
+        console.log('  extracting segments...')
+        const segmentFiles = await extractSegments(mergedWindows, sourceFile, tmpDir)
+
+        console.log('  stitching segments...')
+        await stitchSegments(segmentFiles, outputFile)
+
+        console.log('  uploading to Supabase Storage...')
+        return await uploadVideoAndGetUrl(outputFile, job.id)
+      })
+    }
+
     console.log('  writing DONE...')
     await prisma.job.update({
       where: { id: job.id },
@@ -74,13 +121,19 @@ async function processPendingJob(): Promise<void> {
         transcript: segments as unknown as Prisma.InputJsonValue,
         clipPlan: clipPlan as unknown as Prisma.InputJsonValue,
         stitchedTranscript: stitchedTranscript as unknown as Prisma.InputJsonValue,
+        videoUrl,
+        videoExpiresAt: videoUrl ? new Date(Date.now() + RETENTION_MS) : null,
         status: 'DONE',
       },
     })
     console.log('  DONE ✓')
   } catch (err) {
     console.error('  ERROR:', err)
-    const errorMessage = mapTranscriptError(err)
+    // Prefer transcript-specific messages; fall back to video error mapping for pipeline errors
+    const transcriptMsg = mapTranscriptError(err)
+    const errorMessage = transcriptMsg !== 'Failed to retrieve transcript. Please try again.'
+      ? transcriptMsg
+      : mapVideoError(err)
     console.log(`  writing FAILED: ${errorMessage}`)
     await prisma.job.update({
       where: { id: job.id },
@@ -97,6 +150,7 @@ async function main() {
   while (!shutdown) {
     tick++
     process.stdout.write(`[tick ${tick}] polling... `)
+    await cleanupExpiredVideos(prisma)  // Phase 4: delete expired storage artifacts per D-06
     await processPendingJob()
     process.stdout.write('done\n')
     await sleep(4000)
