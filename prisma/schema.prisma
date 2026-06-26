@@ -25,6 +25,8 @@ model Job {
   transcript         Json?
   clipPlan           Json?
   stitchedTranscript Json?     // Phase 3
+  videoUrl           String?   // Phase 4: Supabase Storage signed URL
+  videoExpiresAt     DateTime? // Phase 4: expiry for worker cleanup pass
   createdAt          DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
