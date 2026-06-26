@@ -55,6 +55,8 @@ export interface Job {
   transcript: TranscriptSegment[] | null
   clipPlan: ClipMatch[] | null
   stitchedTranscript: StitchedTranscriptEntry[] | null  // Phase 3
+  videoUrl:           string | null                      // Phase 4: Supabase Storage signed URL
+  videoExpiresAt:     string | null                      // Phase 4: ISO string, DateTime serialised
   createdAt: string
   updatedAt: string
 }
