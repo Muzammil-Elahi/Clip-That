@@ -106,7 +106,7 @@ export default function StatusView({
         (payload: any) => {
           setStatus(payload.new.status)
           setErrorMessage(payload.new.errorMessage ?? null)
-          setStitchedTranscript(payload.new.stitchedTranscript ?? null)
+          setStitchedTranscript(parseStitchedTranscript(payload.new.stitchedTranscript))
           setVideoUrl(payload.new.videoUrl ?? null)    // Phase 4
         }
       )
