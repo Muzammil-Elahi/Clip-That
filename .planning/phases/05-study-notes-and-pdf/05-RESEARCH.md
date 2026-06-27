@@ -585,22 +585,17 @@ ALTER TABLE "Job" ADD COLUMN "studyNotes" TEXT;
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **SDK Package vs. CONTEXT.md Decision D-01**
+1. **SDK Package vs. CONTEXT.md Decision D-01** — RESOLVED (user-approved 2026-06-26)
    - What we know: CONTEXT.md D-01 specifies `@google/generative-ai`; research confirms this package is the legacy SDK, no longer receiving Gemini 2.0+ features. The new SDK is `@google/genai`.
-   - What's unclear: Whether to override D-01 and use `@google/genai`, or whether to honor D-01 literally and accept the older SDK's limitation.
-   - Recommendation: Use `@google/genai` with `gemini-2.5-flash`. The spirit of D-01 (Gemini Flash, free tier) is preserved; only the package name and model ID change. Planner should note this as a deviation from D-01's literal text.
+   - **Resolution:** User approved switching to `@google/genai` with `gemini-3-flash` (the current Gemini Flash model). Spirit of D-01 preserved (Gemini Flash, free tier); package name and model ID updated. Plans use `@google/genai` throughout.
 
-2. **`notesSettled` initialization for server-rendered DONE jobs**
-   - What we know: When `status-view.tsx` is rendered server-side for a DONE job (user revisits the page), `initialStudyNotes` will be the stored value (or null for soft-fail). The loading state is not relevant.
-   - What's unclear: Does the server action / page query already pass `initialStudyNotes` as a prop? If so, `notesSettled` can initialize to `true` when `initialStatus === DONE`.
-   - Recommendation: Pass `initialStudyNotes` as a prop to `StatusView`. Initialize `notesSettled = initialStatus === JobStatus.DONE`.
+2. **`notesSettled` initialization for server-rendered DONE jobs** — RESOLVED
+   - **Resolution:** Pass `initialStudyNotes` as a prop to `StatusView`. Initialize `notesSettled = initialStatus === JobStatus.DONE`. Implemented in Plan 02 Task 3.
 
-3. **Prisma migration naming and timing**
-   - What we know: Prior migrations follow the pattern `ALTER TABLE "Job" ADD COLUMN ...`. The `studyNotes` field is `Text?` (not JSONB).
-   - What's unclear: Whether the migration can run against the live Supabase database without downtime (adding a nullable TEXT column is safe).
-   - Recommendation: Adding a nullable column to PostgreSQL is a safe online operation. No special handling needed.
+3. **Prisma migration naming and timing** — RESOLVED
+   - **Resolution:** Adding a nullable TEXT column to PostgreSQL is a safe online operation — no downtime required. Migration follows existing pattern `ALTER TABLE "Job" ADD COLUMN ...`. Implemented in Plan 01 Task 1.
 
 ---
 
