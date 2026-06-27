@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Prisma generated client (regenerated on npm install or prisma generate)
 /prisma/generated/
+
+# ytdl-core / yt-dlp player script dumps (contain embedded API keys)
+worker/*-player-script.js
