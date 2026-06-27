@@ -22,9 +22,14 @@ const RETENTION_S = RETENTION_MS / 1000
  * Bypasses RLS for worker-side Storage uploads.
  * Per D-04, T-04-06: NEVER expose SUPABASE_SERVICE_ROLE_KEY to browser or NEXT_PUBLIC_ vars.
  */
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not set — cannot initialise storage client')
+  process.exit(1)
+}
+
 export const supabaseAdmin = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
 )
 
 /**
