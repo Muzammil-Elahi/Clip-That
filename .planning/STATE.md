@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: human_needed
-stopped_at: Phase 04 verification complete — awaiting human sign-off on 6 infrastructure prerequisites
-last_updated: "2026-06-25T23:05:00Z"
-last_activity: 2026-06-25 -- Phase 04 verified (human_needed — infrastructure prerequisites)
+status: All automated checks pass; 6 infrastructure items require human sign-off before feature is operational
+stopped_at: Phase 05 context gathered
+last_updated: "2026-06-27T03:17:29.424Z"
+last_activity: 2026-06-25 -- Phase 04 verified
 progress:
   total_phases: 6
   completed_phases: 4
@@ -37,6 +37,7 @@ Progress: [████████░░] 67% (4/6 phases complete)
 Phase 04 verification identified 6 items requiring human sign-off. See `.planning/phases/04-stitched-video-output/04-VERIFICATION.md` for full instructions.
 
 **Summary of required steps:**
+
 1. Create Supabase Storage bucket `clip-videos` as a private bucket in the Supabase dashboard.
 2. Set `SUPABASE_SERVICE_ROLE_KEY` and `SUPABASE_URL` in `worker/.env.local` and Railway environment variables.
 3. Configure CORS on the `clip-videos` bucket to allow the app's origin for `<video>` playback.
@@ -45,6 +46,7 @@ Phase 04 verification identified 6 items requiring human sign-off. See `.plannin
 6. After 24h, verify signed URL expiry and worker cleanup pass nulled `videoUrl` on the Job row.
 
 Previous human verification items from earlier phases (Phase 01):
+
 1. **Anonymous session establishment** — Load localhost:3000, confirm anonymous user appears in Supabase Auth dashboard.
 2. **Prisma migration** — Run `npx prisma migrate dev --name init` with session-mode pooler DIRECT_URL; confirm Job table, RLS policies, and Realtime publication in Supabase dashboard.
 
@@ -121,6 +123,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-06-25T23:05:00Z
-Stopped at: Phase 04 verification complete — awaiting human sign-off on infrastructure prerequisites
-Resume file: None
+Last session: 2026-06-27T03:17:29.410Z
+Stopped at: Phase 05 context gathered
+Resume file: .planning/phases/05-study-notes-and-pdf/05-CONTEXT.md
