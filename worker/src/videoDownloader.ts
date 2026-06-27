@@ -1,22 +1,42 @@
-import ytdl from '@distube/ytdl-core'
-import { createWriteStream } from 'node:fs'
-import { pipeline } from 'node:stream/promises'
+import { spawn } from 'node:child_process'
+import ffmpegPath from 'ffmpeg-static'
 
-/**
- * Downloads a YouTube video to a local file path via streaming.
- * Filters to combined mp4 format (video + audio) at highest quality.
- * Re-throws all errors — caller handles them via mapVideoError.
- * Per D-02: @distube/ytdl-core is locked; yt-dlp is the upgrade path if this breaks.
- */
+// yt-dlp is the canonical downloader (installed via pip). ytdl-core was dropped
+// because YouTube regularly breaks its decipher parser (D-02 upgrade path).
+const YTDLP_BIN = process.platform === 'win32' ? 'yt-dlp.exe' : 'yt-dlp'
+
 export async function downloadYouTubeVideo(
   youtubeUrl: string,
   destPath: string,
 ): Promise<void> {
-  const stream = ytdl(youtubeUrl, {
-    filter: (fmt) => fmt.container === 'mp4' && fmt.hasVideo && fmt.hasAudio,
-    quality: 'highest',
+  await new Promise<void>((resolve, reject) => {
+    const args = [
+      '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+      '--merge-output-format', 'mp4',
+      '--no-playlist',
+      '-o', destPath,
+      // Point yt-dlp at ffmpeg-static so it can merge video+audio without a
+      // system-level ffmpeg install.
+      ...(ffmpegPath ? ['--ffmpeg-location', ffmpegPath] : []),
+      youtubeUrl,
+    ]
+    const proc = spawn(YTDLP_BIN, args)
+
+    const stderr: string[] = []
+    proc.stderr?.on('data', (chunk: Buffer) => stderr.push(chunk.toString()))
+
+    proc.on('close', (code) => {
+      if (code === 0) {
+        resolve()
+      } else {
+        reject(new Error(stderr.join('').trim() || `yt-dlp exited with code ${code}`))
+      }
+    })
+
+    proc.on('error', (err) => {
+      reject(new Error(`Failed to start yt-dlp: ${err.message}`))
+    })
   })
-  await pipeline(stream as unknown as NodeJS.ReadableStream, createWriteStream(destPath))
 }
 
 /**
@@ -29,7 +49,14 @@ export function mapVideoError(err: unknown): string {
     const msg = err.message.toLowerCase()
     if (msg.includes('ffmpeg')) return 'Video processing failed. Please try again.'
     if (msg.includes('enoent') || msg.includes('no such file')) return 'Video processing failed. Please try again.'
-    if (msg.includes('status code') || msg.includes('403') || msg.includes('410')) {
+    if (
+      msg.includes('status code') ||
+      msg.includes('403') ||
+      msg.includes('410') ||
+      msg.includes('private') ||
+      msg.includes('unavailable') ||
+      msg.includes('not available')
+    ) {
       return 'This video could not be downloaded. It may be private or region-restricted.'
     }
   }

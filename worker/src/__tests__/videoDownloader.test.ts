@@ -1,68 +1,77 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { EventEmitter } from 'node:events'
 
-vi.mock('@distube/ytdl-core', () => ({
-  default: vi.fn(() => ({
-    pipe: vi.fn(),
-    on: vi.fn(),
-    read: vi.fn(),
-  })),
+const mockProc = new EventEmitter() as EventEmitter & {
+  stderr: EventEmitter
+  on: ReturnType<typeof vi.fn>
+}
+mockProc.stderr = new EventEmitter()
+
+vi.mock('node:child_process', () => ({
+  spawn: vi.fn(() => mockProc),
 }))
 
-vi.mock('node:stream/promises', () => ({
-  pipeline: vi.fn().mockResolvedValue(undefined),
-}))
-
-vi.mock('node:fs', () => ({
-  createWriteStream: vi.fn(() => ({})),
-}))
+vi.mock('ffmpeg-static', () => ({ default: '/mock/ffmpeg' }))
 
 import { downloadYouTubeVideo, mapVideoError } from '../videoDownloader.js'
-import ytdl from '@distube/ytdl-core'
-import { pipeline } from 'node:stream/promises'
-import { createWriteStream } from 'node:fs'
+import { spawn } from 'node:child_process'
 
 describe('downloadYouTubeVideo', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    ;(pipeline as ReturnType<typeof vi.fn>).mockResolvedValue(undefined)
+    ;(spawn as ReturnType<typeof vi.fn>).mockReturnValue(mockProc)
+    mockProc.removeAllListeners()
+    mockProc.stderr.removeAllListeners()
   })
 
-  it('calls pipeline with ytdl stream and write stream for valid URL', async () => {
-    const mockStream = { pipe: vi.fn(), on: vi.fn(), read: vi.fn() }
-    ;(ytdl as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockStream)
-    const mockWriteStream = {}
-    ;(createWriteStream as ReturnType<typeof vi.fn>).mockReturnValue(mockWriteStream)
+  it('resolves when yt-dlp exits with code 0', async () => {
+    const promise = downloadYouTubeVideo('https://www.youtube.com/watch?v=test123', '/tmp/out.mp4')
+    mockProc.emit('close', 0)
+    await expect(promise).resolves.toBeUndefined()
 
-    await downloadYouTubeVideo('https://www.youtube.com/watch?v=test123', '/tmp/out.mp4')
-
-    expect(pipeline).toHaveBeenCalledOnce()
-    expect(pipeline).toHaveBeenCalledWith(mockStream, mockWriteStream)
+    expect(spawn).toHaveBeenCalledOnce()
+    const [, args] = (spawn as ReturnType<typeof vi.fn>).mock.calls[0]
+    expect(args).toContain('https://www.youtube.com/watch?v=test123')
+    expect(args).toContain('/tmp/out.mp4')
+    expect(args).toContain('--ffmpeg-location')
+    expect(args).toContain('/mock/ffmpeg')
   })
 
-  it('throws when pipeline rejects', async () => {
-    const mockStream = { pipe: vi.fn(), on: vi.fn(), read: vi.fn() }
-    ;(ytdl as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockStream)
-    ;(pipeline as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('stream error'))
+  it('rejects when yt-dlp exits with non-zero code', async () => {
+    const promise = downloadYouTubeVideo('https://www.youtube.com/watch?v=test123', '/tmp/out.mp4')
+    mockProc.emit('close', 1)
+    await expect(promise).rejects.toThrow('yt-dlp exited with code 1')
+  })
 
-    await expect(
-      downloadYouTubeVideo('https://www.youtube.com/watch?v=test123', '/tmp/out.mp4'),
-    ).rejects.toThrow('stream error')
+  it('rejects when spawn emits error', async () => {
+    const promise = downloadYouTubeVideo('https://www.youtube.com/watch?v=test123', '/tmp/out.mp4')
+    mockProc.emit('error', new Error('ENOENT'))
+    await expect(promise).rejects.toThrow('Failed to start yt-dlp')
   })
 })
 
 describe('mapVideoError', () => {
   it('returns plain-language message for ffmpeg errors', () => {
-    const result = mapVideoError(new Error('FFmpeg crashed'))
-    expect(result).toBe('Video processing failed. Please try again.')
+    expect(mapVideoError(new Error('FFmpeg crashed'))).toBe(
+      'Video processing failed. Please try again.',
+    )
   })
 
   it('returns region-restricted message for HTTP 403 errors', () => {
-    const result = mapVideoError(new Error('Request failed with status code 403'))
-    expect(result).toBe('This video could not be downloaded. It may be private or region-restricted.')
+    expect(mapVideoError(new Error('Request failed with status code 403'))).toBe(
+      'This video could not be downloaded. It may be private or region-restricted.',
+    )
+  })
+
+  it('returns region-restricted message for private video errors', () => {
+    expect(mapVideoError(new Error('Video is private'))).toBe(
+      'This video could not be downloaded. It may be private or region-restricted.',
+    )
   })
 
   it('returns generic message for non-Error values', () => {
-    const result = mapVideoError('unexpected string error')
-    expect(result).toBe('Video processing failed. Please try again.')
+    expect(mapVideoError('unexpected string error')).toBe(
+      'Video processing failed. Please try again.',
+    )
   })
 })
