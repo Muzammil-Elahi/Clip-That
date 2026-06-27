@@ -22,7 +22,12 @@ export async function cleanupExpiredVideos(prisma: PrismaClient): Promise<void> 
   if (expired.length === 0) return
 
   const storagePaths = expired.map((j) => `jobs/${j.id}/output.mp4`)
-  await supabaseAdmin.storage.from(BUCKET).remove(storagePaths)
+  const { error: removeError } = await supabaseAdmin.storage.from(BUCKET).remove(storagePaths)
+  if (removeError) {
+    // Log and bail — do NOT null the DB fields; retry next tick
+    console.error('cleanupExpiredVideos: storage remove failed:', removeError)
+    return
+  }
 
   await prisma.job.updateMany({
     where: { id: { in: expired.map((j) => j.id) } },
