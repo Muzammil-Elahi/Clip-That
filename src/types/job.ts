@@ -57,6 +57,7 @@ export interface Job {
   stitchedTranscript: StitchedTranscriptEntry[] | null  // Phase 3
   videoUrl:           string | null                      // Phase 4: Supabase Storage signed URL
   videoExpiresAt:     string | null                      // Phase 4: ISO string, DateTime serialised
+  studyNotes:         string | null                      // Phase 5: AI-generated Markdown study notes
   createdAt: string
   updatedAt: string
 }
