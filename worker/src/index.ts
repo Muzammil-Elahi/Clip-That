@@ -12,6 +12,7 @@ import { extractYouTubeVideoId } from './youtube.js'
 import { buildClipPlan } from './matcher.js'
 import { expandContextWindows, mergeOverlappingWindows } from './contextExpander.js'
 import { buildStitchedTranscript } from './stitchedTranscript.js'
+import { generateStudyNotes } from './notesGenerator.js'
 import { Prisma } from '../../prisma/generated/prisma/client'
 import { downloadYouTubeVideo, mapVideoError } from './videoDownloader.js'
 import { extractSegments } from './videoExtractor.js'
@@ -92,6 +93,15 @@ async function processPendingJob(): Promise<void> {
     const stitchedTranscript = buildStitchedTranscript(segments, mergedWindows)
     console.log(`  stitchedTranscript: ${stitchedTranscript.length} entries`)
 
+    // Phase 5: study notes generation
+    console.log('  generating study notes...')
+    const studyNotes = await generateStudyNotes(stitchedTranscript, job.topic)
+    if (studyNotes) {
+      console.log('  study notes generated ✓')
+    } else {
+      console.log('  study notes soft-failed (null) — job will still complete')
+    }
+
     // Phase 4: video pipeline — download, extract, stitch, upload
     let videoUrl: string | null = null
     if (mergedWindows.length > 0) {
@@ -122,6 +132,7 @@ async function processPendingJob(): Promise<void> {
         stitchedTranscript: stitchedTranscript as unknown as Prisma.InputJsonValue,
         videoUrl,
         videoExpiresAt: videoUrl ? new Date(Date.now() + RETENTION_MS) : null,
+        studyNotes,        // string | null — Text? column, no cast needed (per D-03 / PATTERNS.md)
         status: 'DONE',
       },
     })
