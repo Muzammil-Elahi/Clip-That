@@ -54,7 +54,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **NOT-02**: Study notes include clear explanations of the searched topic.
 - [ ] **NOT-03**: Study notes include key points from the selected segments.
 - [ ] **NOT-04**: Study notes include relevant definitions when the source content supports them.
-- [ ] **NOT-05**: User can download the study notes as a PDF.
+- [x] **NOT-05**: User can download the study notes as a PDF.
 
 ### Job Status and Errors
 
@@ -134,7 +134,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NOT-02 | Phase 5 | Pending |
 | NOT-03 | Phase 5 | Pending |
 | NOT-04 | Phase 5 | Pending |
-| NOT-05 | Phase 5 | Pending |
+| NOT-05 | Phase 5 | Complete |
 | JOB-01 | Phase 1 | Complete |
 | JOB-02 | Phase 1 | Complete |
 | JOB-03 | Phase 4 | Complete |

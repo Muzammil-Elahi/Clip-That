@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Transcript and Exact Search** - System can retrieve YouTube transcripts and find exact topic mentions. (completed 2026-06-18)
 - [x] **Phase 3: Context Clip Plan and Stitched Transcript** - System can build context windows and produce the transcript for selected segments. (completed 2026-06-25)
 - [x] **Phase 4: Stitched Video Output** - System can extract, stitch, play, and expire generated video artifacts. (completed 2026-06-26)
-- [ ] **Phase 5: Study Notes and PDF** - User receives topic-specific study notes and can download them as a PDF.
+- [x] **Phase 5: Study Notes and PDF** - User receives topic-specific study notes and can download them as a PDF. (completed 2026-06-27)
 - [ ] **Phase 6: Optional Semantic Matching** - User can enable semantic reference matching with confidence/reason indicators.
 
 ## Phase Details
@@ -139,7 +139,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 05-02-PLAN.md — Frontend Notes tab: react-markdown + @react-pdf/renderer install, StudyNotesPDFDocument component, StatusView three-state Notes tab (loading/available/soft-fail), PDFDownloadLink, Job type + status page extension (NOT-05)
+- [x] 05-02-PLAN.md — Frontend Notes tab: react-markdown + @react-pdf/renderer install, StudyNotesPDFDocument component, StatusView three-state Notes tab (loading/available/soft-fail), PDFDownloadLink, Job type + status page extension (NOT-05)
 
 ### Phase 6: Optional Semantic Matching
 
@@ -171,5 +171,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 2. Transcript and Exact Search | 2/2 | Complete   | 2026-06-18 |
 | 3. Context Clip Plan and Stitched Transcript | 2/2 | Complete    | 2026-06-25 |
 | 4. Stitched Video Output | 2/2 | Complete   | 2026-06-26 |
-| 5. Study Notes and PDF | 1/2 | In Progress|  |
+| 5. Study Notes and PDF | 2/2 | Complete   | 2026-06-27 |
 | 6. Optional Semantic Matching | 0/2 | Not started | - |
