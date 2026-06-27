@@ -1,9 +1,9 @@
+import './env-setup.js'
 import dns from 'node:dns'
 dns.setDefaultResultOrder('ipv4first')
 
-import { config } from 'dotenv'
 import { fileURLToPath } from 'node:url'
-import { dirname, resolve } from 'node:path'
+import { dirname } from 'node:path'
 import pg from 'pg'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '../../prisma/generated/prisma/client'
@@ -23,7 +23,6 @@ import os from 'node:os'
 import path from 'node:path'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-config({ path: resolve(__dirname, '../../.env.local') })
 
 if (!process.env.WORKER_DATABASE_URL && !process.env.DATABASE_URL) {
   console.error('WORKER_DATABASE_URL is not set in .env.local — cannot connect to database')
