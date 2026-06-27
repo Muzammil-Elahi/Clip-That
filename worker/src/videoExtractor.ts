@@ -29,7 +29,12 @@ export function runFfmpeg(args: string[]): Promise<void> {
 
 /**
  * Extracts each ExpandedWindow from sourceFile as a separate segment file.
- * Uses FFmpeg -ss/-to -c copy for fast stream-copy extraction (no re-encode).
+ * Uses FFmpeg -c copy for stream-copy extraction (no re-encode).
+ * -ss/-to are placed AFTER -i (post-input seek) for frame-accurate cutting —
+ * pre-input seek (-ss before -i) snaps to the nearest keyframe, which can
+ * introduce several seconds of unintended leading content before the target
+ * timestamp. Post-input seek decodes up to the cut point (slightly slower)
+ * but starts at the exact requested timestamp.
  * Runs each segment sequentially to avoid disk contention.
  * Returns array of output file paths.
  */
@@ -47,11 +52,10 @@ export async function extractSegments(
     const outputFile = path.join(tmpDir, `segment-${i}.mp4`)
 
     await runFfmpeg([
+      '-i', sourceFile,
       '-ss', startSec,
       '-to', endSec,
-      '-i', sourceFile,
       '-c', 'copy',
-      '-avoid_negative_ts', 'make_zero',
       '-y',
       outputFile,
     ])
