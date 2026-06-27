@@ -11,6 +11,10 @@ export async function stitchSegments(
   segmentPaths: string[],
   outputPath: string,
 ): Promise<void> {
+  if (segmentPaths.length === 0) {
+    throw new Error('stitchSegments: segmentPaths must not be empty')
+  }
+
   const filelistPath = path.join(path.dirname(outputPath), 'filelist.txt')
 
   // Build filelist.txt content — escape single quotes in paths per PATTERNS.md
