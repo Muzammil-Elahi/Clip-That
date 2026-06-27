@@ -22,10 +22,16 @@ export async function downloadYouTubeVideo(
 /**
  * Maps video processing errors to plain-language user-facing strings.
  * Follows Phase 1 D-11 convention: single sentence, period at end, no jargon.
+ * Never surfaces raw internal messages (FFmpeg stderr, ENOENT paths, etc.) to end users.
  */
 export function mapVideoError(err: unknown): string {
   if (err instanceof Error) {
-    return err.message
+    const msg = err.message.toLowerCase()
+    if (msg.includes('ffmpeg')) return 'Video processing failed. Please try again.'
+    if (msg.includes('enoent') || msg.includes('no such file')) return 'Video processing failed. Please try again.'
+    if (msg.includes('status code') || msg.includes('403') || msg.includes('410')) {
+      return 'This video could not be downloaded. It may be private or region-restricted.'
+    }
   }
   return 'Video processing failed. Please try again.'
 }
