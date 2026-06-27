@@ -62,7 +62,7 @@ Notes:
 - Notes tab prose content rendered by `react-markdown` + `@tailwindcss/typography` `prose` class. The `prose` class applies its own heading/body/list sizing internally; no override needed. Outer wrapper uses `text-base` (16px / 400) as base font.
 - Soft-fail error message in Notes tab uses `text-base text-muted-foreground` (16px / 400) — same as other muted inline messages in the app.
 - Loading placeholder text uses `text-base text-muted-foreground` (16px / 400).
-- PDF download button label uses `text-sm font-medium` (14px / 500 — shadcn Button default for `size="sm"`).
+- PDF download button label uses `text-sm font-semibold` (14px / 600 — shadcn Button default overridden with `className="font-semibold"` to enforce the two-weight constraint).
 - Only two weights used: 400 and 600. The `prose` class internally uses its own heading weights but these are scoped to rendered Markdown only.
 
 Source: `status-view.tsx` class `text-2xl font-semibold leading-tight` for headings; `text-base text-muted-foreground` for body copy; established in Phase 3 UI-SPEC.
@@ -145,7 +145,7 @@ A plain text placeholder is used (Claude's discretion per D-06); no spinner comp
     fileName={`study-notes-${topic}.pdf`}
   >
     {({ loading }) => (
-      <Button variant="default" size="sm" disabled={loading} className="w-fit">
+      <Button variant="default" size="sm" disabled={loading} className="w-fit font-semibold">
         {loading ? 'Preparing PDF...' : 'Download PDF'}
       </Button>
     )}
