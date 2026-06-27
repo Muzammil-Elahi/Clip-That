@@ -25,6 +25,25 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }))
 
+// Mock next/dynamic — return a synchronous stub so PDFDownloadLink is available immediately in jsdom.
+vi.mock('next/dynamic', () => ({
+  default: (_fn: unknown) =>
+    function MockPDFDownloadLink({ children }: { children: (s: { loading: boolean }) => React.ReactNode }) {
+      return <>{children({ loading: false })}</>
+    },
+}))
+
+// Mock @react-pdf/renderer — prevents jsdom canvas/PDF API errors.
+vi.mock('@react-pdf/renderer', () => ({
+  PDFDownloadLink: ({ children }: { children: (s: { loading: boolean }) => React.ReactNode }) =>
+    <>{children({ loading: false })}</>,
+  Document: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  Page: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  View: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  Text: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  StyleSheet: { create: (s: unknown) => s },
+}))
+
 // Mock @/lib/supabase/client — Realtime subscription must not make real network calls.
 // The channel object uses method chaining: channel().on().subscribe() where subscribe()
 // returns the channel (so removeChannel receives the correct reference). The from() chain
@@ -55,6 +74,8 @@ const baseProps = {
   initialErrorMessage: null,
   initialStitchedTranscript: null,
   initialVideoUrl: null,
+  initialStudyNotes: null,
+  youtubeUrl: 'https://www.youtube.com/watch?v=test',
   topic: 'machine learning',
 }
 
@@ -168,14 +189,15 @@ describe('StatusView', () => {
     ).toBeInTheDocument()
   })
 
-  it('Notes tab shows spec-defined copy when DONE (WR-02)', () => {
-    render(<StatusView {...baseProps} initialStatus="DONE" />)
+  it('Notes tab shows soft-fail message when DONE with no studyNotes (WR-02)', () => {
+    render(<StatusView {...baseProps} initialStatus="DONE" initialStudyNotes={null} />)
 
     // base-ui Tabs unmounts inactive panels — click Notes tab to activate it
     fireEvent.click(screen.getByRole('tab', { name: /notes/i }))
 
+    // DONE + initialStudyNotes=null → notesSettled=true → soft-fail message (State C)
     expect(
-      screen.getByText('Study notes will appear here in a future update.')
+      screen.getByText('Notes could not be generated. Your video and transcript are still available.')
     ).toBeInTheDocument()
   })
 })

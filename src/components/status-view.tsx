@@ -12,6 +12,17 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import type { StitchedTranscriptEntry } from '@/types/job'
 import { cn } from '@/lib/utils'
 import { parseStitchedTranscript } from '@/lib/parseStitchedTranscript'
+import Markdown from 'react-markdown'
+import dynamic from 'next/dynamic'
+import { StudyNotesPDFDocument } from './StudyNotesPDFDocument'
+import { Download } from 'lucide-react'
+
+// Phase 5: PDFDownloadLink loaded client-side only (ssr: false prevents build-time error
+// from @react-pdf/renderer browser API usage — per RESEARCH.md Pitfall 2, D-07)
+const PDFDownloadLink = dynamic(
+  () => import('@react-pdf/renderer').then(mod => mod.PDFDownloadLink),
+  { ssr: false, loading: () => null }
+)
 
 /**
  * Rotating status messages shown while the job is PENDING or PROCESSING.
@@ -43,6 +54,8 @@ interface StatusViewProps {
   initialStitchedTranscript: StitchedTranscriptEntry[] | null  // Phase 3
   initialVideoUrl: string | null                                // Phase 4: D-08
   topic: string                                                 // Phase 3
+  initialStudyNotes: string | null                              // Phase 5: D-04
+  youtubeUrl: string                                            // Phase 5: PDF footer
 }
 
 /**
@@ -66,6 +79,8 @@ export default function StatusView({
   initialStitchedTranscript,
   initialVideoUrl,
   topic,
+  initialStudyNotes,
+  youtubeUrl,
 }: StatusViewProps) {
   const router = useRouter()
   const [status, setStatus] = useState(initialStatus)
@@ -76,6 +91,8 @@ export default function StatusView({
     initialStitchedTranscript
   )
   const [videoUrl, setVideoUrl] = useState<string | null>(initialVideoUrl ?? null)  // Phase 4
+  const [studyNotes, setStudyNotes] = useState<string | null>(initialStudyNotes ?? null)   // Phase 5
+  const [notesSettled, setNotesSettled] = useState(initialStatus === JobStatus.DONE)        // Phase 5: true when server-rendered DONE job; Realtime overrides if needed
   const [messageIndex, setMessageIndex] = useState(0)
   const [progress, setProgress] = useState(() => {
     if (initialStatus === JobStatus.DONE) return 100
@@ -107,7 +124,9 @@ export default function StatusView({
           setStatus(payload.new.status)
           setErrorMessage(payload.new.errorMessage ?? null)
           setStitchedTranscript(parseStitchedTranscript(payload.new.stitchedTranscript))
-          setVideoUrl(payload.new.videoUrl ?? null)    // Phase 4
+          setVideoUrl(payload.new.videoUrl ?? null)        // Phase 4
+          setStudyNotes(payload.new.studyNotes ?? null)    // Phase 5
+          setNotesSettled(true)                            // Phase 5: Realtime DONE confirmed
         }
       )
       .subscribe()
@@ -128,7 +147,7 @@ export default function StatusView({
     const interval = setInterval(async () => {
       const { data } = await supabase
         .from('Job')
-        .select('status, errorMessage, stitchedTranscript, videoUrl')
+        .select('status, errorMessage, stitchedTranscript, videoUrl, studyNotes')
         .eq('id', initialJobId)
         .single()
 
@@ -138,7 +157,9 @@ export default function StatusView({
         setStatus(row.status)
         setErrorMessage(row.errorMessage ?? null)
         setStitchedTranscript(parseStitchedTranscript(row.stitchedTranscript))
-        setVideoUrl(row.videoUrl ?? null)    // Phase 4
+        setVideoUrl(row.videoUrl ?? null)                             // Phase 4
+        setStudyNotes(row.studyNotes ?? null)                         // Phase 5
+        if (row.status === JobStatus.DONE) setNotesSettled(true)      // Phase 5
       }
     }, 3000)
 
@@ -270,9 +291,37 @@ export default function StatusView({
               </div>
             </TabsContent>
             <TabsContent value="notes">
-              <p className="text-base text-muted-foreground">
-                Study notes will appear here in a future update.
-              </p>
+              {/* State A: loading — studyNotes not yet arrived via Realtime */}
+              {!notesSettled && studyNotes === null && (
+                <div className="flex flex-col gap-4">
+                  <p className="text-base text-muted-foreground">Generating your study notes...</p>
+                </div>
+              )}
+              {/* State B: notes available — render Markdown prose + PDF download button */}
+              {studyNotes !== null && (
+                <div className="flex flex-col gap-4">
+                  <div className="prose prose-neutral max-w-none">
+                    <Markdown>{studyNotes}</Markdown>
+                  </div>
+                  <PDFDownloadLink
+                    document={<StudyNotesPDFDocument topic={topic} studyNotes={studyNotes} youtubeUrl={youtubeUrl} />}
+                    fileName={`study-notes-${topic.toLowerCase().replace(/\s+/g, '-')}.pdf`}
+                  >
+                    {({ loading }: { loading: boolean }) => (
+                      <Button variant="default" size="sm" disabled={loading} className="w-fit font-semibold">
+                        <Download size={16} className="mr-2" />
+                        {loading ? 'Preparing PDF...' : 'Download PDF'}
+                      </Button>
+                    )}
+                  </PDFDownloadLink>
+                </div>
+              )}
+              {/* State C: soft-fail — DONE confirmed but studyNotes never arrived */}
+              {notesSettled && studyNotes === null && (
+                <div className="flex flex-col gap-4">
+                  <p className="text-base text-muted-foreground">Notes could not be generated. Your video and transcript are still available.</p>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         )}

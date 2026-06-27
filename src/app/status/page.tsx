@@ -63,6 +63,8 @@ export default async function StatusPage() {
         initialStitchedTranscript={parseStitchedTranscript(job.stitchedTranscript)}
         initialVideoUrl={job.videoUrl ?? null}
         topic={job.topic}
+        initialStudyNotes={job.studyNotes ?? null}
+        youtubeUrl={job.youtubeUrl}
       />
     </main>
   )
