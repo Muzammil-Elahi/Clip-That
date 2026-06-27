@@ -235,7 +235,7 @@ export default function StatusView({
               <TabsTrigger value="notes">Notes</TabsTrigger>
             </TabsList>
             <TabsContent value="video">
-              {!videoUrl && (stitchedTranscript?.length ?? 0) === 0 ? (
+              {!videoUrl && Array.isArray(stitchedTranscript) && stitchedTranscript.length === 0 ? (
                 <p className="text-base text-muted-foreground">
                   No clips found for &quot;{topic}&quot;.
                 </p>
