@@ -1,5 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+// Set env vars before the module loads — storageUploader.ts has a module-level guard
+// that calls process.exit(1) if these are missing. vi.hoisted runs during the same
+// hoisting pass as vi.mock, before any imports execute.
+vi.hoisted(() => {
+  process.env.SUPABASE_URL = 'https://test.supabase.co'
+  process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-role-key'
+})
+
 // Mocks must be defined before the module is imported.
 // supabaseAdmin is created at module load time, so we capture the storage mock
 // via the vi.mock factory directly — no beforeEach re-assignment needed for the client.

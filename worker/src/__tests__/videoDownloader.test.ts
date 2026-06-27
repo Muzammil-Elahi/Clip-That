@@ -51,9 +51,14 @@ describe('downloadYouTubeVideo', () => {
 })
 
 describe('mapVideoError', () => {
-  it('returns specific message for Error instances', () => {
+  it('returns plain-language message for ffmpeg errors', () => {
     const result = mapVideoError(new Error('FFmpeg crashed'))
-    expect(result).toBe('FFmpeg crashed')
+    expect(result).toBe('Video processing failed. Please try again.')
+  })
+
+  it('returns region-restricted message for HTTP 403 errors', () => {
+    const result = mapVideoError(new Error('Request failed with status code 403'))
+    expect(result).toBe('This video could not be downloaded. It may be private or region-restricted.')
   })
 
   it('returns generic message for non-Error values', () => {
