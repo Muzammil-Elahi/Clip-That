@@ -1,16 +1,21 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { generateStudyNotes } from '../notesGenerator.js'
 import type { StitchedTranscriptEntry } from '../types.js'
 
-// Mock @google/genai at module level
+// Mock @google/genai at module level before importing notesGenerator
+// vi.mock is hoisted, so the factory function runs before imports
 const mockGenerateContent = vi.fn()
 vi.mock('@google/genai', () => ({
-  GoogleGenAI: vi.fn().mockImplementation(() => ({
-    models: {
-      generateContent: mockGenerateContent,
-    },
-  })),
+  GoogleGenAI: function MockGoogleGenAI() {
+    return {
+      models: {
+        generateContent: mockGenerateContent,
+      },
+    }
+  },
 }))
+
+// Import after mock so the module-level ai client uses the mock
+const { generateStudyNotes } = await import('../notesGenerator.js')
 
 const entries: StitchedTranscriptEntry[] = [
   { sourceStartMs: 0, sourceEndMs: 5000, text: 'Photosynthesis converts sunlight to energy.' },

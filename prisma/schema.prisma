@@ -27,6 +27,7 @@ model Job {
   stitchedTranscript Json?     // Phase 3
   videoUrl           String?   // Phase 4: Supabase Storage signed URL
   videoExpiresAt     DateTime? // Phase 4: expiry for worker cleanup pass
+  studyNotes         String?   // Phase 5: AI-generated study notes Markdown text
   createdAt          DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
