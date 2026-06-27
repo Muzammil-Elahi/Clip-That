@@ -133,8 +133,13 @@ Plans:
 
 Plans:
 
-- [ ] 05-01: Implement grounded study-note generation from stitched transcript spans.
-- [ ] 05-02: Implement notes UI and PDF generation/download.
+**Wave 1**
+
+- [ ] 05-01-PLAN.md — Worker: @google/genai install, notesGenerator module (generateStudyNotes — gemini-2.5-flash, soft-fail, 1 retry), Prisma migration (studyNotes String?), worker index wiring (NOT-01, NOT-02, NOT-03, NOT-04)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 05-02-PLAN.md — Frontend Notes tab: react-markdown + @react-pdf/renderer install, StudyNotesPDFDocument component, StatusView three-state Notes tab (loading/available/soft-fail), PDFDownloadLink, Job type + status page extension (NOT-05)
 
 ### Phase 6: Optional Semantic Matching
 
