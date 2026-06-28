@@ -22,7 +22,7 @@ function assertValidEmbedding(values: number[] | undefined, context: string): nu
     throw new Error(`Empty embedding returned for: ${context}`)
   }
   if (values.length !== 768) {
-    console.warn(`Unexpected embedding dimension ${values.length} (expected 768) for: ${context}`)
+    throw new Error(`Unexpected embedding dimension ${values.length} (expected 768) for: ${context}`)
   }
   return values
 }
@@ -67,6 +67,11 @@ async function embedWithRetry(texts: string[]): Promise<number[][]> {
 }
 
 function cosineSimilarity(a: number[], b: number[]): number {
+  if (a.length !== b.length) {
+    throw new Error(
+      `cosineSimilarity: vector length mismatch (a=${a.length}, b=${b.length})`
+    )
+  }
   let dot = 0, magA = 0, magB = 0
   for (let i = 0; i < a.length; i++) {
     dot  += a[i] * b[i]
