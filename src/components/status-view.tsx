@@ -64,8 +64,9 @@ interface StatusViewProps {
  * PENDING/PROCESSING; a destructive Alert with "Try again" on FAILED; and a
  * tab-based result view with transcript when DONE.
  *
- * Security (T-03-01): Realtime channel filtered to userId=eq.<uid> — only
- *   receives events for this user's own jobs. RLS on Job table also enforced.
+ * Security (T-03-01): Realtime channel scoped by job id AND userId — only
+ *   receives UPDATE events for this specific job row. Server-side userId guard
+ *   (status/page.tsx) + RLS on Job table provide defense in depth.
  * Security (T-03-03): errorMessage rendered as JSX text node inside
  *   AlertDescription — never uses dangerouslySetInnerHTML.
  * Security (T-03-06, T-03-07): transcript entry text and topic rendered as JSX
@@ -117,7 +118,7 @@ export default function StatusView({
           event: 'UPDATE',
           schema: 'public',
           table: 'Job',
-          filter: `id=eq.${initialJobId}`,
+          filter: `id=eq.${initialJobId}&userId=eq.${userId}`,
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (payload: any) => {
@@ -134,7 +135,7 @@ export default function StatusView({
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [initialJobId])
+  }, [initialJobId, userId])
 
   // Polling fallback — queries job status every 3 s while active so the UI
   // transitions even when Realtime events are not delivered (e.g. connection
