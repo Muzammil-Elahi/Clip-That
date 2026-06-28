@@ -19,9 +19,6 @@ function assertValidEmbedding(values: number[] | undefined, context: string): nu
   if (!values || values.length === 0) {
     throw new Error(`Empty embedding returned for: ${context}`)
   }
-  if (values.length !== 768) {
-    throw new Error(`Unexpected embedding dimension ${values.length} (expected 768) for: ${context}`)
-  }
   return values
 }
 
