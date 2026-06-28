@@ -22,6 +22,9 @@ export interface ClipMatch {
   endMs: number            // Math.round((segment.offset + segment.duration) * 1000)
   text: string             // raw transcript text of matched segment(s)
   segmentIndices: number[] // indices into transcript array (for Phase 3)
+  // Phase 6 additions — optional so exact-match code needs no change
+  matchType?: 'exact' | 'semantic'
+  confidence?: number // cosine similarity 0–1, 2 decimal places
 }
 
 /**
