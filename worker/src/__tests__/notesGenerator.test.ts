@@ -23,11 +23,13 @@ const entries: StitchedTranscriptEntry[] = [
 
 describe('generateStudyNotes', () => {
   beforeEach(() => {
+    vi.useFakeTimers()
     vi.clearAllMocks()
     process.env.GEMINI_API_KEY = 'test-api-key'
   })
 
   afterEach(() => {
+    vi.useRealTimers()
     delete process.env.GEMINI_API_KEY
   })
 
@@ -43,7 +45,9 @@ describe('generateStudyNotes', () => {
   it('soft-fail — returns null when Gemini throws on both attempts', async () => {
     mockGenerateContent.mockRejectedValue(new Error('API error'))
 
-    const result = await generateStudyNotes(entries, 'photosynthesis')
+    const promise = generateStudyNotes(entries, 'photosynthesis')
+    await vi.runAllTimersAsync()   // advance the 2s sleep instantly
+    const result = await promise
 
     expect(result).toBeNull()
   })
@@ -53,7 +57,9 @@ describe('generateStudyNotes', () => {
       .mockRejectedValueOnce(new Error('Transient error'))
       .mockResolvedValueOnce({ text: '## Key Points\nA, B' })
 
-    const result = await generateStudyNotes(entries, 'photosynthesis')
+    const promise = generateStudyNotes(entries, 'photosynthesis')
+    await vi.runAllTimersAsync()   // advance the 2s sleep instantly
+    const result = await promise
 
     expect(result).not.toBeNull()
     expect(typeof result).toBe('string')
