@@ -52,13 +52,16 @@ async function embedWithRetry(ai: GoogleGenAI, texts: string[]): Promise<number[
     try {
       return await batchEmbed(ai, texts)
     } catch (err: unknown) {
-      const is429 =
+      const isRetryable =
         err instanceof Error && (
           err.message.includes('429') ||
-          err.message.includes('RESOURCE_EXHAUSTED')
+          err.message.includes('503') ||
+          err.message.includes('500') ||
+          err.message.includes('RESOURCE_EXHAUSTED') ||
+          err.message.includes('UNAVAILABLE')
         )
-      if (attempt === 0 && is429) {
-        console.warn('  Gemini embed 429 — retrying in 2s...')
+      if (attempt === 0 && isRetryable) {
+        console.warn('  Gemini embed transient error — retrying in 2s...')
         await sleep(2000)
       } else {
         throw err
