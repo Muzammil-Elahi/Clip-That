@@ -17,17 +17,11 @@ import dynamic from 'next/dynamic'
 import { StudyNotesPDFDocument } from './StudyNotesPDFDocument'
 import { Download } from 'lucide-react'
 
-// Phase 5: PDFDownloadLink loaded client-side only (ssr: false prevents build-time error
-// from @react-pdf/renderer browser API usage — per RESEARCH.md Pitfall 2, D-07)
 const PDFDownloadLink = dynamic(
   () => import('@react-pdf/renderer').then(mod => mod.PDFDownloadLink),
   { ssr: false, loading: () => null }
 )
 
-/**
- * Rotating status messages shown while the job is PENDING or PROCESSING.
- * Declared in order as specified by the UI-SPEC Copywriting Contract (D-10).
- */
 export const STATUS_MESSAGES = [
   'Finding your topic in the video...',
   'Reading through the transcript...',
@@ -36,10 +30,6 @@ export const STATUS_MESSAGES = [
   'Almost there...',
 ]
 
-/**
- * Formats a millisecond timestamp as [M:SS].
- * Examples: 64000 → '[1:04]', 750000 → '[12:30]', 5000 → '[0:05]'
- */
 function formatTimestamp(ms: number): string {
   const minutes = Math.floor(ms / 60000)
   const seconds = String(Math.floor((ms % 60000) / 1000)).padStart(2, '0')
@@ -51,28 +41,21 @@ interface StatusViewProps {
   initialStatus: string
   initialJobId: string
   initialErrorMessage: string | null
-  initialStitchedTranscript: StitchedTranscriptEntry[] | null  // Phase 3
-  initialVideoUrl: string | null                                // Phase 4: D-08
-  topic: string                                                 // Phase 3
-  initialStudyNotes: string | null                              // Phase 5: D-04
-  youtubeUrl: string                                            // Phase 5: PDF footer
-  semanticEnabled: boolean                                      // Phase 6
-  initialSemanticFailed: boolean                                // Phase 6
+  initialStitchedTranscript: StitchedTranscriptEntry[] | null
+  initialVideoUrl: string | null
+  topic: string
+  initialStudyNotes: string | null
+  youtubeUrl: string
+  semanticEnabled: boolean
+  initialSemanticFailed: boolean
 }
 
 /**
- * StatusView — client component that subscribes to Supabase Realtime for live
- * job status updates. Renders a progress bar + rotating messages while
- * PENDING/PROCESSING; a destructive Alert with "Try again" on FAILED; and a
- * tab-based result view with transcript when DONE.
+ * StatusView — subscribes to Supabase Realtime for live job updates.
  *
- * Security (T-03-01): Realtime channel scoped by job id AND userId — only
- *   receives UPDATE events for this specific job row. Server-side userId guard
- *   (status/page.tsx) + RLS on Job table provide defense in depth.
- * Security (T-03-03): errorMessage rendered as JSX text node inside
- *   AlertDescription — never uses dangerouslySetInnerHTML.
- * Security (T-03-06, T-03-07): transcript entry text and topic rendered as JSX
- *   text nodes only — never uses dangerouslySetInnerHTML.
+ * Security (T-03-01): channel scoped by job id AND userId.
+ * Security (T-03-03): errorMessage rendered as JSX text node, never innerHTML.
+ * Security (T-03-06, T-03-07): transcript text rendered as JSX text nodes only.
  */
 export default function StatusView({
   userId,
@@ -89,16 +72,14 @@ export default function StatusView({
 }: StatusViewProps) {
   const router = useRouter()
   const [status, setStatus] = useState(initialStatus)
-  const [errorMessage, setErrorMessage] = useState<string | null>(
-    initialErrorMessage
-  )
+  const [errorMessage, setErrorMessage] = useState<string | null>(initialErrorMessage)
   const [stitchedTranscript, setStitchedTranscript] = useState<StitchedTranscriptEntry[] | null>(
     initialStitchedTranscript
   )
-  const [videoUrl, setVideoUrl] = useState<string | null>(initialVideoUrl ?? null)  // Phase 4
-  const [studyNotes, setStudyNotes] = useState<string | null>(initialStudyNotes ?? null)   // Phase 5
-  const [notesSettled, setNotesSettled] = useState(initialStatus === JobStatus.DONE)        // Phase 5: true when server-rendered DONE job; Realtime overrides if needed
-  const [semanticFailed, setSemanticFailed] = useState(initialSemanticFailed)              // Phase 6
+  const [videoUrl, setVideoUrl] = useState<string | null>(initialVideoUrl ?? null)
+  const [studyNotes, setStudyNotes] = useState<string | null>(initialStudyNotes ?? null)
+  const [notesSettled, setNotesSettled] = useState(initialStatus === JobStatus.DONE)
+  const [semanticFailed, setSemanticFailed] = useState(initialSemanticFailed)
   const [messageIndex, setMessageIndex] = useState(0)
   const [progress, setProgress] = useState(() => {
     if (initialStatus === JobStatus.DONE) return 100
@@ -106,12 +87,8 @@ export default function StatusView({
     return 10
   })
 
-  // Track the progress animation interval so we can clear it
-  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
-    null
-  )
+  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  // Supabase Realtime subscription — listen for job row UPDATE events
   useEffect(() => {
     const supabase = createClient()
     const channel = supabase
@@ -130,22 +107,17 @@ export default function StatusView({
           setStatus(payload.new.status)
           setErrorMessage(payload.new.errorMessage ?? null)
           setStitchedTranscript(parseStitchedTranscript(payload.new.stitchedTranscript))
-          setVideoUrl(payload.new.videoUrl ?? null)        // Phase 4
-          setStudyNotes(payload.new.studyNotes ?? null)    // Phase 5
-          setNotesSettled(true)                            // Phase 5: Realtime DONE confirmed
-          setSemanticFailed(payload.new.semanticFailed ?? false) // Phase 6
+          setVideoUrl(payload.new.videoUrl ?? null)
+          setStudyNotes(payload.new.studyNotes ?? null)
+          setNotesSettled(true)
+          setSemanticFailed(payload.new.semanticFailed ?? false)
         }
       )
       .subscribe()
 
-    return () => {
-      supabase.removeChannel(channel)
-    }
+    return () => { supabase.removeChannel(channel) }
   }, [initialJobId, userId])
 
-  // Polling fallback — queries job status every 3 s while active so the UI
-  // transitions even when Realtime events are not delivered (e.g. connection
-  // race, RLS misconfiguration). Stops automatically once the job is terminal.
   useEffect(() => {
     const isActive = status === JobStatus.PENDING || status === JobStatus.PROCESSING
     if (!isActive) return
@@ -164,20 +136,17 @@ export default function StatusView({
         setStatus(row.status)
         setErrorMessage(row.errorMessage ?? null)
         setStitchedTranscript(parseStitchedTranscript(row.stitchedTranscript))
-        setVideoUrl(row.videoUrl ?? null)                             // Phase 4
-        setStudyNotes(row.studyNotes ?? null)                         // Phase 5
-        if (row.status === JobStatus.DONE) setNotesSettled(true)      // Phase 5
-        setSemanticFailed(row.semanticFailed ?? false)                // Phase 6
+        setVideoUrl(row.videoUrl ?? null)
+        setStudyNotes(row.studyNotes ?? null)
+        if (row.status === JobStatus.DONE) setNotesSettled(true)
+        setSemanticFailed(row.semanticFailed ?? false)
       }
     }, 3000)
 
     return () => clearInterval(interval)
   }, [status, initialJobId])
 
-  // Progress animation — drives the progress bar from 10% toward 90% during
-  // PENDING/PROCESSING, then snaps to 100% when DONE
   useEffect(() => {
-    // Clear any existing interval
     if (progressIntervalRef.current) {
       clearInterval(progressIntervalRef.current)
       progressIntervalRef.current = null
@@ -185,10 +154,7 @@ export default function StatusView({
 
     if (status === JobStatus.DONE) {
       setProgress(100)
-    } else if (
-      status === JobStatus.PENDING ||
-      status === JobStatus.PROCESSING
-    ) {
+    } else if (status === JobStatus.PENDING || status === JobStatus.PROCESSING) {
       progressIntervalRef.current = setInterval(() => {
         setProgress((prev) => {
           if (prev >= 90) return prev
@@ -205,11 +171,8 @@ export default function StatusView({
     }
   }, [status])
 
-  // Message cycling — rotates through STATUS_MESSAGES every 4s while active
   useEffect(() => {
-    const isActive =
-      status === JobStatus.PENDING || status === JobStatus.PROCESSING
-
+    const isActive = status === JobStatus.PENDING || status === JobStatus.PROCESSING
     if (!isActive) return
 
     const interval = setInterval(() => {
@@ -219,7 +182,6 @@ export default function StatusView({
     return () => clearInterval(interval)
   }, [status])
 
-  // Determine heading text based on current status
   const headingText =
     status === JobStatus.DONE
       ? 'Done!'
@@ -227,140 +189,171 @@ export default function StatusView({
         ? 'Something went wrong'
         : 'Working on it...'
 
-  const isActive =
-    status === JobStatus.PENDING || status === JobStatus.PROCESSING
+  const isActive = status === JobStatus.PENDING || status === JobStatus.PROCESSING
   const isFailed = status === JobStatus.FAILED
   const isDone = status === JobStatus.DONE
+
+  const tabTriggerClass = 'px-0 pb-3 rounded-none after:bg-primary data-active:bg-transparent'
 
   return (
     <Card className={cn('w-full', isDone ? 'max-w-2xl' : 'max-w-md')}>
       <CardContent className="flex flex-col gap-6 p-6">
-        {/* Status heading — wrapped in aria-live region for screen reader announcements.
-            Not rendered for FAILED state because the Alert component carries the heading. */}
+        {/* Brand mark — links back to home for easy re-submission */}
+        <a
+          href="/"
+          className="flex items-center gap-2.5 w-fit group"
+          aria-label="Clip That — submit another video"
+        >
+          <span
+            className="text-primary text-base leading-none select-none group-hover:text-primary/75 transition-colors"
+            aria-hidden="true"
+          >
+            ▶
+          </span>
+          <span className="font-semibold tracking-[0.22em] text-[0.6875rem] uppercase text-foreground/60 group-hover:text-foreground/80 transition-colors">
+            Clip That
+          </span>
+        </a>
+
+        {/* Status heading — wrapped in aria-live for screen reader announcements */}
         {!isFailed && (
           <div aria-live="polite">
-            <h1 className="text-2xl font-semibold leading-tight">{headingText}</h1>
+            <h1 className="text-2xl font-semibold leading-tight tracking-tight">{headingText}</h1>
           </div>
         )}
 
-        {/* Progress bar — shown during PENDING/PROCESSING and DONE */}
+        {/* Progress bar — amber fill via --primary token */}
         {(isActive || isDone) && (
           <Progress value={progress} aria-label="Processing progress" />
         )}
 
-        {/* Rotating status message — shown during PENDING/PROCESSING */}
+        {/* Rotating status message */}
         {isActive && (
-          <p className="text-base text-muted-foreground">
-            {STATUS_MESSAGES[messageIndex]}
-          </p>
+          <p className="text-sm text-muted-foreground">{STATUS_MESSAGES[messageIndex]}</p>
         )}
 
-        {/* Phase 6: semantic matching fallback notice */}
+        {/* Semantic matching fallback notice */}
         {isDone && semanticEnabled && semanticFailed && (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             Related-reference search hit a temporary limit — showing exact matches only.
           </p>
         )}
 
-        {/* Done state — tab layout with Transcript (default), Video, and Notes tabs */}
+        {/* Done state — tabs */}
         {isDone && (
           <Tabs defaultValue="transcript">
-            <TabsList>
-              <TabsTrigger value="video">Video</TabsTrigger>
-              <TabsTrigger value="transcript">Transcript</TabsTrigger>
-              <TabsTrigger value="notes">Notes</TabsTrigger>
+            <TabsList
+              variant="line"
+              className="w-full justify-start gap-6 border-b border-border rounded-none h-auto pb-0"
+            >
+              <TabsTrigger value="video" className={tabTriggerClass}>
+                Video
+              </TabsTrigger>
+              <TabsTrigger value="transcript" className={tabTriggerClass}>
+                Transcript
+              </TabsTrigger>
+              <TabsTrigger value="notes" className={tabTriggerClass}>
+                Notes
+              </TabsTrigger>
             </TabsList>
-            <TabsContent value="video">
+
+            <TabsContent value="video" className="mt-5">
               {!videoUrl && Array.isArray(stitchedTranscript) && stitchedTranscript.length === 0 ? (
-                <p className="text-base text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   No clips found for &quot;{topic}&quot;.
                 </p>
               ) : videoUrl ? (
-                <video
-                  controls
-                  src={videoUrl}
-                  className="w-full rounded-md"
-                />
+                <video controls src={videoUrl} className="w-full rounded-sm" />
               ) : (
-                <p className="text-base text-muted-foreground">
-                  Working on it...
-                </p>
+                <p className="text-sm text-muted-foreground">Working on it...</p>
               )}
             </TabsContent>
-            <TabsContent value="transcript">
-              <div className="flex flex-col gap-2">
-                {(stitchedTranscript?.length ?? 0) === 0 ? (
-                  <p className="text-base text-muted-foreground">
-                    No mentions of &quot;{topic}&quot; were found in this video.
-                  </p>
-                ) : (
-                  stitchedTranscript!.map((entry) => (
-                    <div key={entry.sourceStartMs} className="flex gap-2 items-baseline">
-                      <span className="text-sm font-semibold text-foreground shrink-0">
+
+            <TabsContent value="transcript" className="mt-5">
+              {(stitchedTranscript?.length ?? 0) === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No mentions of &quot;{topic}&quot; were found in this video.
+                </p>
+              ) : (
+                /*
+                 * Amber monospace timestamps — the signature element of this design.
+                 * They evoke a timecode edit list (EDL) from video editing software.
+                 */
+                <div className="flex flex-col gap-3">
+                  {stitchedTranscript!.map((entry) => (
+                    <div key={entry.sourceStartMs} className="flex gap-4 items-baseline">
+                      <span className="font-mono text-[0.75rem] text-primary shrink-0 tabular-nums leading-relaxed">
                         {formatTimestamp(entry.sourceStartMs)}
                       </span>
-                      <span className="text-base text-foreground">{entry.text}</span>
+                      <span className="text-sm text-foreground leading-relaxed">{entry.text}</span>
                     </div>
-                  ))
-                )}
-              </div>
-            </TabsContent>
-            <TabsContent value="notes">
-              {/* State A: loading — studyNotes not yet arrived via Realtime */}
-              {!notesSettled && studyNotes === null && (
-                <div className="flex flex-col gap-4">
-                  <p className="text-base text-muted-foreground">Generating your study notes...</p>
+                  ))}
                 </div>
               )}
-              {/* State B: notes available — render Markdown prose + PDF download button */}
+            </TabsContent>
+
+            <TabsContent value="notes" className="mt-5">
+              {!notesSettled && studyNotes === null && (
+                <div className="flex items-center gap-3">
+                  <div className="h-3.5 w-3.5 rounded-full border-2 border-primary border-t-transparent animate-spin shrink-0" />
+                  <p className="text-sm text-muted-foreground">Generating your study notes...</p>
+                </div>
+              )}
               {studyNotes !== null && (
-                <div className="flex flex-col gap-4">
-                  <div className="prose prose-neutral max-w-none">
+                <div className="flex flex-col gap-5">
+                  <div className="prose prose-neutral prose-invert max-w-none text-sm">
                     <Markdown>{studyNotes}</Markdown>
                   </div>
                   <PDFDownloadLink
-                    document={<StudyNotesPDFDocument topic={topic} studyNotes={studyNotes} youtubeUrl={youtubeUrl} />}
+                    document={
+                      <StudyNotesPDFDocument
+                        topic={topic}
+                        studyNotes={studyNotes}
+                        youtubeUrl={youtubeUrl}
+                      />
+                    }
                     fileName={`study-notes-${
-                      topic
-                        .toLowerCase()
-                        .replace(/\s+/g, '-')
-                        .replace(/[^\w\-]/g, '')
+                      topic.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]/g, '')
                     }.pdf`}
                   >
                     {({ loading }: { loading: boolean }) => (
-                      <Button variant="default" size="sm" disabled={loading} className="w-fit font-semibold">
-                        <Download size={16} className="mr-2" />
-                        {loading ? 'Preparing PDF...' : 'Download PDF'}
+                      <Button
+                        variant="default"
+                        size="sm"
+                        disabled={loading}
+                        className="w-fit text-[0.6875rem] font-semibold tracking-widest uppercase"
+                      >
+                        <Download size={13} className="mr-2" />
+                        {loading ? 'Preparing...' : 'Download PDF'}
                       </Button>
                     )}
                   </PDFDownloadLink>
                 </div>
               )}
-              {/* State C: soft-fail — DONE confirmed but studyNotes never arrived */}
               {notesSettled && studyNotes === null && (
-                <div className="flex flex-col gap-4">
-                  <p className="text-base text-muted-foreground">Notes could not be generated. Your video and transcript are still available.</p>
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  Notes could not be generated. Your video and transcript are still available.
+                </p>
               )}
             </TabsContent>
           </Tabs>
         )}
 
-        {/* Failure state — destructive Alert with error message and Try again button */}
+        {/* Failed state */}
         {isFailed && (
           <div className="flex flex-col gap-4">
             <Alert variant="destructive">
-              <AlertTitle className="text-base font-semibold">
+              <AlertTitle className="text-sm font-semibold tracking-wide">
                 Something went wrong
               </AlertTitle>
-              <AlertDescription>{errorMessage}</AlertDescription>
+              <AlertDescription className="text-sm">{errorMessage}</AlertDescription>
             </Alert>
             <Button
               variant="default"
               onClick={() => router.push('/')}
-              className="w-full h-11"
+              className="w-full h-10 text-[0.6875rem] font-semibold tracking-widest uppercase"
             >
-              Try again
+              Try Again
             </Button>
           </div>
         )}

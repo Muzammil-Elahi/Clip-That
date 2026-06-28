@@ -40,12 +40,15 @@ export default async function StatusPage() {
   // Empty state — no job found for this user
   if (!job) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-4 bg-background">
+      <main className="min-h-screen flex items-center justify-center px-4 py-16">
         <div className="text-center flex flex-col gap-4">
-          <p className="text-base text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             No active job. Ready to clip something?
           </p>
-          <a href="/" className="text-base font-semibold underline underline-offset-4 hover:text-muted-foreground transition-colors">
+          <a
+            href="/"
+            className="text-sm font-semibold underline underline-offset-4 text-primary hover:text-primary/75 transition-colors"
+          >
             Start over
           </a>
         </div>
@@ -54,7 +57,7 @@ export default async function StatusPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 bg-background">
+    <main className="min-h-screen flex items-center justify-center px-4 py-16">
       <StatusView
         userId={user.id}
         initialStatus={job.status}
