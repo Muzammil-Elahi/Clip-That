@@ -62,6 +62,7 @@ export interface Job {
   videoExpiresAt:     string | null                      // Phase 4: ISO string, DateTime serialised
   studyNotes:         string | null                      // Phase 5: AI-generated Markdown study notes
   semanticEnabled:    boolean                            // Phase 6: user opted into semantic matching
+  semanticFailed:     boolean                            // Phase 6: true when semantic matching errored
   createdAt: string
   updatedAt: string
 }

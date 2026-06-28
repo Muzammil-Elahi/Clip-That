@@ -65,6 +65,8 @@ export default async function StatusPage() {
         topic={job.topic}
         initialStudyNotes={job.studyNotes ?? null}
         youtubeUrl={job.youtubeUrl}
+        semanticEnabled={job.semanticEnabled}
+        initialSemanticFailed={job.semanticFailed}
       />
     </main>
   )

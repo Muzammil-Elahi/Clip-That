@@ -77,6 +77,8 @@ const baseProps = {
   initialStudyNotes: null,
   youtubeUrl: 'https://www.youtube.com/watch?v=test',
   topic: 'machine learning',
+  semanticEnabled: false,
+  initialSemanticFailed: false,
 }
 
 describe('StatusView', () => {

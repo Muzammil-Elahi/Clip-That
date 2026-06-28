@@ -29,6 +29,7 @@ model Job {
   videoExpiresAt     DateTime? // Phase 4: expiry for worker cleanup pass
   studyNotes         String?   // Phase 5: AI-generated study notes Markdown text
   semanticEnabled    Boolean   @default(false) // Phase 6: user opted into semantic matching
+  semanticFailed     Boolean   @default(false) // Phase 6: true when semantic matching errored (quota, API failure)
   createdAt          DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 

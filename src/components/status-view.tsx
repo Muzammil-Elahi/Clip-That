@@ -56,6 +56,8 @@ interface StatusViewProps {
   topic: string                                                 // Phase 3
   initialStudyNotes: string | null                              // Phase 5: D-04
   youtubeUrl: string                                            // Phase 5: PDF footer
+  semanticEnabled: boolean                                      // Phase 6
+  initialSemanticFailed: boolean                                // Phase 6
 }
 
 /**
@@ -82,6 +84,8 @@ export default function StatusView({
   topic,
   initialStudyNotes,
   youtubeUrl,
+  semanticEnabled,
+  initialSemanticFailed,
 }: StatusViewProps) {
   const router = useRouter()
   const [status, setStatus] = useState(initialStatus)
@@ -94,6 +98,7 @@ export default function StatusView({
   const [videoUrl, setVideoUrl] = useState<string | null>(initialVideoUrl ?? null)  // Phase 4
   const [studyNotes, setStudyNotes] = useState<string | null>(initialStudyNotes ?? null)   // Phase 5
   const [notesSettled, setNotesSettled] = useState(initialStatus === JobStatus.DONE)        // Phase 5: true when server-rendered DONE job; Realtime overrides if needed
+  const [semanticFailed, setSemanticFailed] = useState(initialSemanticFailed)              // Phase 6
   const [messageIndex, setMessageIndex] = useState(0)
   const [progress, setProgress] = useState(() => {
     if (initialStatus === JobStatus.DONE) return 100
@@ -128,6 +133,7 @@ export default function StatusView({
           setVideoUrl(payload.new.videoUrl ?? null)        // Phase 4
           setStudyNotes(payload.new.studyNotes ?? null)    // Phase 5
           setNotesSettled(true)                            // Phase 5: Realtime DONE confirmed
+          setSemanticFailed(payload.new.semanticFailed ?? false) // Phase 6
         }
       )
       .subscribe()
@@ -148,7 +154,7 @@ export default function StatusView({
     const interval = setInterval(async () => {
       const { data } = await supabase
         .from('Job')
-        .select('status, errorMessage, stitchedTranscript, videoUrl, studyNotes')
+        .select('status, errorMessage, stitchedTranscript, videoUrl, studyNotes, semanticFailed')
         .eq('id', initialJobId)
         .single()
 
@@ -161,6 +167,7 @@ export default function StatusView({
         setVideoUrl(row.videoUrl ?? null)                             // Phase 4
         setStudyNotes(row.studyNotes ?? null)                         // Phase 5
         if (row.status === JobStatus.DONE) setNotesSettled(true)      // Phase 5
+        setSemanticFailed(row.semanticFailed ?? false)                // Phase 6
       }
     }, 3000)
 
@@ -245,6 +252,13 @@ export default function StatusView({
         {isActive && (
           <p className="text-base text-muted-foreground">
             {STATUS_MESSAGES[messageIndex]}
+          </p>
+        )}
+
+        {/* Phase 6: semantic matching fallback notice */}
+        {isDone && semanticEnabled && semanticFailed && (
+          <p className="text-sm text-muted-foreground">
+            Related-reference search hit a temporary limit — showing exact matches only.
           </p>
         )}
 

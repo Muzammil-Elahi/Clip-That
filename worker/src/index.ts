@@ -92,12 +92,14 @@ async function processPendingJob(): Promise<void> {
 
     // Phase 6: optional semantic matching — guarded by job.semanticEnabled
     let semanticMatches: ClipMatch[] = []
+    let semanticFailed = false
     if (job.semanticEnabled) {
       try {
         semanticMatches = await findSemanticMatches(segments, job.topic)
         console.log(`  semantic matches: ${semanticMatches.length}`)
       } catch (err) {
         console.error('  Semantic matching failed (soft-fail, exact matches preserved):', err)
+        semanticFailed = true
       }
     }
     const exactIndices = new Set(exactMatches.flatMap(m => m.segmentIndices))
@@ -150,6 +152,7 @@ async function processPendingJob(): Promise<void> {
         videoUrl,
         videoExpiresAt: videoUrl ? new Date(Date.now() + RETENTION_MS) : null,
         studyNotes,        // string | null — Text? column, no cast needed (per D-03 / PATTERNS.md)
+        semanticFailed,
         status: 'DONE',
       },
     })

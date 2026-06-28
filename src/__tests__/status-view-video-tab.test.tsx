@@ -42,7 +42,11 @@ const defaultProps = {
   initialErrorMessage: null,
   initialStitchedTranscript: [{ sourceStartMs: 0, sourceEndMs: 5000, text: 'hello' }],
   initialVideoUrl: null,
+  initialStudyNotes: null,
+  youtubeUrl: 'https://www.youtube.com/watch?v=test',
   topic: 'photosynthesis',
+  semanticEnabled: false,
+  initialSemanticFailed: false,
 }
 
 /** Click the Video tab button to make the Video tab panel active in the DOM. */

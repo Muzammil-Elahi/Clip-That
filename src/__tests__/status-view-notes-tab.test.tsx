@@ -67,6 +67,8 @@ const defaultProps = {
   initialStudyNotes: null,
   youtubeUrl: 'https://www.youtube.com/watch?v=test123',
   topic: 'photosynthesis',
+  semanticEnabled: false,
+  initialSemanticFailed: false,
 }
 
 /** Click the Notes tab button to make the Notes tab panel active in the DOM. */
