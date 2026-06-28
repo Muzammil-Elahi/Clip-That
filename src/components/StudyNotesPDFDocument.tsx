@@ -29,11 +29,14 @@ const styles = StyleSheet.create({
  */
 function stripMarkdown(md: string): string {
   return md
-    .replace(/#{1,6}\s+/g, '')          // headings: ## Heading → Heading
-    .replace(/\*\*(.+?)\*\*/g, '$1')    // bold: **text** → text
-    .replace(/\*(.+?)\*/g, '$1')        // italic: *text* → text
-    .replace(/^[-*]\s+/gm, '• ')        // list bullets: - item → • item
-    .replace(/`{1,3}/g, '')             // code ticks: `code` → code
+    .replace(/#{1,6}\s+/g, '')                   // headings: ## Heading → Heading
+    .replace(/\*\*(.+?)\*\*/g, '$1')              // bold: **text** → text
+    .replace(/\*(.+?)\*/g, '$1')                  // italic: *text* → text
+    .replace(/^[-*]\s+/gm, '• ')                 // unordered list bullets: - item → • item
+    .replace(/^\d+\.\s+/gm, '')                   // ordered list numbers: 1. item → item
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')     // links: [text](url) → text
+    .replace(/^---+$/gm, '')                      // horizontal rules: --- → (removed)
+    .replace(/`{1,3}/g, '')                       // code ticks: `code` → code
     .trim()
 }
 
