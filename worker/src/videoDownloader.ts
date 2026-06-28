@@ -14,6 +14,7 @@ export async function downloadYouTubeVideo(
       '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
       '--merge-output-format', 'mp4',
       '--no-playlist',
+      '--js-runtimes', 'nodejs',
       '-o', destPath,
       // Point yt-dlp at ffmpeg-static so it can merge video+audio without a
       // system-level ffmpeg install.
