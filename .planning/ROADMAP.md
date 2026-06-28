@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Context Clip Plan and Stitched Transcript** - System can build context windows and produce the transcript for selected segments. (completed 2026-06-25)
 - [x] **Phase 4: Stitched Video Output** - System can extract, stitch, play, and expire generated video artifacts. (completed 2026-06-26)
 - [x] **Phase 5: Study Notes and PDF** - User receives topic-specific study notes and can download them as a PDF. (completed 2026-06-27)
-- [ ] **Phase 6: Optional Semantic Matching** - User can enable semantic reference matching with confidence/reason indicators.
+- [x] **Phase 6: Optional Semantic Matching** - User can enable semantic reference matching with confidence/reason indicators. (completed 2026-06-28)
 
 ## Phase Details
 
@@ -159,11 +159,11 @@ Plans:
 
 **Wave 1**
 
-- [ ] 06-01-PLAN.md — Worker backend: ClipMatch type extension (matchType/confidence), semanticMatcher module (gemini-embedding-001, cosine similarity, SEMANTIC_THRESHOLD=0.75, MAX_SEMANTIC_MATCHES=10), unit tests + eval fixture, Prisma migration (semanticEnabled Boolean @default(false)), worker index.ts integration (soft-fail semantic path after buildClipPlan)
+- [x] 06-01-PLAN.md — Worker backend: ClipMatch type extension (matchType/confidence), semanticMatcher module (gemini-embedding-001, cosine similarity, SEMANTIC_THRESHOLD=0.75, MAX_SEMANTIC_MATCHES=10), unit tests + eval fixture, Prisma migration (semanticEnabled Boolean @default(false)), worker index.ts integration (soft-fail semantic path after buildClipPlan)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 06-02-PLAN.md — Frontend: Job/ClipMatch type mirror, submitJobSchema + semanticEnabled field, submit-job.ts Server Action update, shadcn Checkbox install, submission form "Also find related references" toggle, Transcript tab "(semantic)" label for semantic matches
+- [x] 06-02-PLAN.md — Frontend: Job/ClipMatch type mirror, submitJobSchema + semanticEnabled field, submit-job.ts Server Action update, shadcn Checkbox install, submission form "Also find related references" toggle, Transcript tab "(semantic)" label for semantic matches
 
 ## Progress
 
@@ -177,4 +177,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 3. Context Clip Plan and Stitched Transcript | 2/2 | Complete    | 2026-06-25 |
 | 4. Stitched Video Output | 2/2 | Complete   | 2026-06-26 |
 | 5. Study Notes and PDF | 2/2 | Complete   | 2026-06-27 |
-| 6. Optional Semantic Matching | 0/2 | Not started | - |
+| 6. Optional Semantic Matching | 2/2 | Complete   | 2026-06-28 |
