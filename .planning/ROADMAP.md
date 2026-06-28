@@ -157,8 +157,13 @@ Plans:
 
 Plans:
 
-- [ ] 06-01: Implement transcript chunk embeddings and semantic retrieval.
-- [ ] 06-02: Add semantic toggle behavior, match labeling, thresholds, and result explanations.
+**Wave 1**
+
+- [ ] 06-01-PLAN.md — Worker backend: ClipMatch type extension (matchType/confidence), semanticMatcher module (gemini-embedding-001, cosine similarity, SEMANTIC_THRESHOLD=0.75, MAX_SEMANTIC_MATCHES=10), unit tests + eval fixture, Prisma migration (semanticEnabled Boolean @default(false)), worker index.ts integration (soft-fail semantic path after buildClipPlan)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 06-02-PLAN.md — Frontend: Job/ClipMatch type mirror, submitJobSchema + semanticEnabled field, submit-job.ts Server Action update, shadcn Checkbox install, submission form "Also find related references" toggle, Transcript tab "(semantic)" label for semantic matches
 
 ## Progress
 
