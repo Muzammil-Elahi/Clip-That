@@ -10,6 +10,8 @@ import { PrismaClient } from '../../prisma/generated/prisma/client'
 import { fetchTranscript, mapTranscriptError } from './transcript.js'
 import { extractYouTubeVideoId } from './youtube.js'
 import { buildClipPlan } from './matcher.js'
+import { findSemanticMatches } from './semanticMatcher.js'
+import type { ClipMatch } from './types.js'
 import { expandContextWindows, mergeOverlappingWindows } from './contextExpander.js'
 import { buildStitchedTranscript } from './stitchedTranscript.js'
 import { generateStudyNotes } from './notesGenerator.js'
@@ -85,8 +87,23 @@ async function processPendingJob(): Promise<void> {
     const segments = await fetchTranscript(videoId)
     console.log(`  got ${segments.length} segments`)
 
-    const clipPlan = buildClipPlan(segments, job.topic)
-    console.log(`  clipPlan: ${clipPlan.length} matches`)
+    const exactMatches = buildClipPlan(segments, job.topic)
+    console.log(`  clipPlan (exact): ${exactMatches.length} matches`)
+
+    // Phase 6: optional semantic matching — guarded by job.semanticEnabled
+    let semanticMatches: ClipMatch[] = []
+    if (job.semanticEnabled) {
+      try {
+        semanticMatches = await findSemanticMatches(segments, job.topic)
+        console.log(`  semantic matches: ${semanticMatches.length}`)
+      } catch (err) {
+        console.error('  Semantic matching failed (soft-fail, exact matches preserved):', err)
+      }
+    }
+    const exactIndices = new Set(exactMatches.flatMap(m => m.segmentIndices))
+    const dedupedSemantic = semanticMatches.filter(m => !m.segmentIndices.some(i => exactIndices.has(i)))
+    const clipPlan = [...exactMatches, ...dedupedSemantic]
+    console.log(JSON.stringify({ event: 'semantic_matching_complete', jobId: job.id, semanticEnabled: job.semanticEnabled, exactMatchCount: exactMatches.length, semanticMatchCount: dedupedSemantic.length }))
 
     const expandedWindows = expandContextWindows(segments, clipPlan)
     const mergedWindows = mergeOverlappingWindows(expandedWindows)
