@@ -1,74 +1,77 @@
-[
-  {
-    "topic": "gradient descent",
-    "segmentText": "Gradient descent is an optimization algorithm that iteratively adjusts parameters by moving in the direction of steepest descent of the loss function.",
-    "expectedMatch": true,
-    "category": "true-positive-narrow"
-  },
-  {
-    "topic": "gradient descent",
-    "segmentText": "We update our weights by subtracting the learning rate multiplied by the gradient of the cost function with respect to each weight.",
-    "expectedMatch": true,
-    "category": "true-positive-narrow"
-  },
-  {
-    "topic": "gradient descent",
-    "segmentText": "In stochastic gradient descent, instead of computing the gradient over the entire dataset, we use a single randomly selected training example per step.",
-    "expectedMatch": true,
-    "category": "true-positive-narrow"
-  },
-  {
-    "topic": "neural networks",
-    "segmentText": "A neural network consists of layers of interconnected nodes, where each connection has a weight that is learned during training.",
-    "expectedMatch": true,
-    "category": "true-positive-broad"
-  },
-  {
-    "topic": "neural networks",
-    "segmentText": "Deep learning models with many hidden layers can learn hierarchical representations of data, extracting increasingly abstract features at each layer.",
-    "expectedMatch": true,
-    "category": "true-positive-broad"
-  },
-  {
-    "topic": "softmax function",
-    "segmentText": "The softmax function converts raw logit scores into a probability distribution that sums to one, used in multiclass classification output layers.",
-    "expectedMatch": true,
-    "category": "adjacent-concept-adversarial"
-  },
-  {
-    "topic": "softmax function",
-    "segmentText": "Cross-entropy loss measures the difference between the predicted probability distribution and the true label distribution during classification training.",
-    "expectedMatch": false,
-    "category": "adjacent-concept-adversarial"
-  },
-  {
-    "topic": "softmax function",
-    "segmentText": "Backpropagation computes the gradient of the loss with respect to each weight using the chain rule of differentiation.",
-    "expectedMatch": false,
-    "category": "adjacent-concept-adversarial"
-  },
-  {
-    "topic": "gradient descent",
-    "segmentText": "In economics, a downward-sloping demand curve shows that consumers purchase more of a good as its price descends.",
-    "expectedMatch": false,
-    "category": "cross-discipline-adversarial"
-  },
-  {
-    "topic": "photosynthesis",
-    "segmentText": "The mitosis process divides a cell into two daughter cells, each containing the same genetic material as the parent cell.",
-    "expectedMatch": false,
-    "category": "cross-discipline-adversarial"
-  },
-  {
-    "topic": "quantum entanglement",
-    "segmentText": "Today we will discuss classical Newtonian mechanics and how objects move under the influence of gravity.",
-    "expectedMatch": false,
-    "category": "zero-match"
-  },
-  {
-    "topic": "gradient descent",
-    "segmentText": "Gradient descent is the core optimization algorithm; we apply gradient descent every epoch to minimize training loss.",
-    "expectedMatch": true,
-    "category": "exact-match-overlap"
-  }
-]
+{
+  "_comment": "Future evaluation dataset — not yet consumed by any test. Intended for an offline semantic eval harness that measures threshold calibration across true-positive, adversarial, and zero-match categories. Do not delete.",
+  "cases": [
+    {
+      "topic": "gradient descent",
+      "segmentText": "Gradient descent is an optimization algorithm that iteratively adjusts parameters by moving in the direction of steepest descent of the loss function.",
+      "expectedMatch": true,
+      "category": "true-positive-narrow"
+    },
+    {
+      "topic": "gradient descent",
+      "segmentText": "We update our weights by subtracting the learning rate multiplied by the gradient of the cost function with respect to each weight.",
+      "expectedMatch": true,
+      "category": "true-positive-narrow"
+    },
+    {
+      "topic": "gradient descent",
+      "segmentText": "In stochastic gradient descent, instead of computing the gradient over the entire dataset, we use a single randomly selected training example per step.",
+      "expectedMatch": true,
+      "category": "true-positive-narrow"
+    },
+    {
+      "topic": "neural networks",
+      "segmentText": "A neural network consists of layers of interconnected nodes, where each connection has a weight that is learned during training.",
+      "expectedMatch": true,
+      "category": "true-positive-broad"
+    },
+    {
+      "topic": "neural networks",
+      "segmentText": "Deep learning models with many hidden layers can learn hierarchical representations of data, extracting increasingly abstract features at each layer.",
+      "expectedMatch": true,
+      "category": "true-positive-broad"
+    },
+    {
+      "topic": "softmax function",
+      "segmentText": "The softmax function converts raw logit scores into a probability distribution that sums to one, used in multiclass classification output layers.",
+      "expectedMatch": true,
+      "category": "adjacent-concept-adversarial"
+    },
+    {
+      "topic": "softmax function",
+      "segmentText": "Cross-entropy loss measures the difference between the predicted probability distribution and the true label distribution during classification training.",
+      "expectedMatch": false,
+      "category": "adjacent-concept-adversarial"
+    },
+    {
+      "topic": "softmax function",
+      "segmentText": "Backpropagation computes the gradient of the loss with respect to each weight using the chain rule of differentiation.",
+      "expectedMatch": false,
+      "category": "adjacent-concept-adversarial"
+    },
+    {
+      "topic": "gradient descent",
+      "segmentText": "In economics, a downward-sloping demand curve shows that consumers purchase more of a good as its price descends.",
+      "expectedMatch": false,
+      "category": "cross-discipline-adversarial"
+    },
+    {
+      "topic": "photosynthesis",
+      "segmentText": "The mitosis process divides a cell into two daughter cells, each containing the same genetic material as the parent cell.",
+      "expectedMatch": false,
+      "category": "cross-discipline-adversarial"
+    },
+    {
+      "topic": "quantum entanglement",
+      "segmentText": "Today we will discuss classical Newtonian mechanics and how objects move under the influence of gravity.",
+      "expectedMatch": false,
+      "category": "zero-match"
+    },
+    {
+      "topic": "gradient descent",
+      "segmentText": "Gradient descent is the core optimization algorithm; we apply gradient descent every epoch to minimize training loss.",
+      "expectedMatch": true,
+      "category": "exact-match-overlap"
+    }
+  ]
+}
