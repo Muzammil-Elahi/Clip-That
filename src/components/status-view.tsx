@@ -306,7 +306,12 @@ export default function StatusView({
                   </div>
                   <PDFDownloadLink
                     document={<StudyNotesPDFDocument topic={topic} studyNotes={studyNotes} youtubeUrl={youtubeUrl} />}
-                    fileName={`study-notes-${topic.toLowerCase().replace(/\s+/g, '-')}.pdf`}
+                    fileName={`study-notes-${
+                      topic
+                        .toLowerCase()
+                        .replace(/\s+/g, '-')
+                        .replace(/[^\w\-]/g, '')
+                    }.pdf`}
                   >
                     {({ loading }: { loading: boolean }) => (
                       <Button variant="default" size="sm" disabled={loading} className="w-fit font-semibold">
