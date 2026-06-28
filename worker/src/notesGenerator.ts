@@ -51,7 +51,7 @@ export async function generateStudyNotes(
   for (let attempt = 0; attempt <= 1; attempt++) {
     try {
       const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
+        model: 'gemini-3-flash-preview',
         contents: prompt,
       })
       return response.text ?? null
