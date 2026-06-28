@@ -29,6 +29,7 @@ export async function submitJob(
   const result = submitJobSchema.safeParse({
     youtubeUrl: formData.get('youtubeUrl'),
     topic: formData.get('topic'),
+    semanticEnabled: formData.get('semanticEnabled'),
   })
 
   if (!result.success) {
@@ -44,7 +45,7 @@ export async function submitJob(
   }
 
   // 3. Create the job row (RLS enforces userId = auth.uid() — T-01-04)
-  const { youtubeUrl, topic } = result.data
+  const { youtubeUrl, topic, semanticEnabled } = result.data
   try {
     const job = await prisma.job.create({
       data: {
@@ -52,6 +53,7 @@ export async function submitJob(
         youtubeUrl,
         topic,
         status: 'PENDING',
+        semanticEnabled,
       },
     })
     return { jobId: job.id }

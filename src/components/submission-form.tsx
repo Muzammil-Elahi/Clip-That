@@ -5,6 +5,7 @@ import { useFormStatus } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { submitJob } from '@/actions/submit-job'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
@@ -108,6 +109,19 @@ function FormContent({
               {topicErrors[0]}
             </p>
           )}
+        </div>
+
+        {/* Semantic matching toggle (D-07, SUB-04) */}
+        <div className="flex items-center gap-3">
+          <Checkbox
+            id="semanticEnabled"
+            name="semanticEnabled"
+            value="on"
+            disabled={isPending}
+          />
+          <Label htmlFor="semanticEnabled" className="text-sm font-normal">
+            Also find related references
+          </Label>
         </div>
 
         {/* Submit button */}

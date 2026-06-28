@@ -10,4 +10,5 @@ export const submitJobSchema = z.object({
     .string()
     .min(2, 'Enter at least 2 characters.')
     .max(200, 'Keep it under 200 characters.'),
+  semanticEnabled: z.coerce.boolean().optional().default(false),
 })

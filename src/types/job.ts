@@ -29,6 +29,9 @@ export interface ClipMatch {
   endMs: number            // Math.round((segment.offset + segment.duration) * 1000)
   text: string             // raw transcript text of matched segment(s)
   segmentIndices: number[] // indices into transcript array (for Phase 3)
+  // Phase 6 additions — optional so exact-match code requires zero changes
+  matchType?: 'exact' | 'semantic'
+  confidence?: number // cosine similarity 0–1, 2 decimal places
 }
 
 /**
@@ -58,6 +61,7 @@ export interface Job {
   videoUrl:           string | null                      // Phase 4: Supabase Storage signed URL
   videoExpiresAt:     string | null                      // Phase 4: ISO string, DateTime serialised
   studyNotes:         string | null                      // Phase 5: AI-generated Markdown study notes
+  semanticEnabled:    boolean                            // Phase 6: user opted into semantic matching
   createdAt: string
   updatedAt: string
 }
