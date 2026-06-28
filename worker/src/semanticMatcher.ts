@@ -54,7 +54,11 @@ async function embedWithRetry(texts: string[]): Promise<number[][]> {
     try {
       return await batchEmbed(texts)
     } catch (err: unknown) {
-      const is429 = err instanceof Error && err.message.includes('429')
+      const is429 =
+        err instanceof Error && (
+          err.message.includes('429') ||
+          err.message.includes('RESOURCE_EXHAUSTED')
+        )
       if (attempt === 0 && is429) {
         console.warn('  Gemini embed 429 — retrying in 2s...')
         await sleep(2000)
