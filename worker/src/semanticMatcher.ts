@@ -8,8 +8,6 @@
 import { GoogleGenAI } from '@google/genai'
 import type { TranscriptSegment, ClipMatch } from './types.js'
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY ?? '' })
-
 const sleep = (ms: number) => new Promise<void>(res => setTimeout(res, ms))
 
 const EMBEDDING_MODEL    = 'gemini-embedding-001' // text-embedding-004 shut down Jan 14 2026
@@ -27,7 +25,7 @@ function assertValidEmbedding(values: number[] | undefined, context: string): nu
   return values
 }
 
-async function batchEmbed(texts: string[]): Promise<number[][]> {
+async function batchEmbed(ai: GoogleGenAI, texts: string[]): Promise<number[][]> {
   const results: number[][] = []
   for (let i = 0; i < texts.length; i += EMBED_CHUNK_SIZE) {
     const chunk = texts.slice(i, i + EMBED_CHUNK_SIZE)
@@ -49,10 +47,10 @@ async function batchEmbed(texts: string[]): Promise<number[][]> {
   return results
 }
 
-async function embedWithRetry(texts: string[]): Promise<number[][]> {
+async function embedWithRetry(ai: GoogleGenAI, texts: string[]): Promise<number[][]> {
   for (let attempt = 0; attempt <= 1; attempt++) {
     try {
-      return await batchEmbed(texts)
+      return await batchEmbed(ai, texts)
     } catch (err: unknown) {
       const is429 =
         err instanceof Error && (
@@ -95,11 +93,12 @@ export async function findSemanticMatches(
     console.warn('  GEMINI_API_KEY not set — skipping semantic matching (soft-fail)')
     return []
   }
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
 
   try {
-    const topicVec = (await embedWithRetry([topic]))[0]
+    const topicVec = (await embedWithRetry(ai, [topic]))[0]
     const segTexts = segments.map(s => s.text)
-    const segVecs  = await embedWithRetry(segTexts)
+    const segVecs  = await embedWithRetry(ai, segTexts)
 
     return segments
       .map((seg, i) => ({
