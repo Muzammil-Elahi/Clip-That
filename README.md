@@ -185,26 +185,17 @@ npx prisma generate && next build
 | `SUPABASE_URL` | Supabase → Settings → API → Project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API → service_role key |
 | `GEMINI_API_KEY` | Google AI Studio |
-| `YOUTUBE_COOKIES` | See below |
 
-#### Setting `YOUTUBE_COOKIES`
-
-Railway's servers are in AWS data centers. YouTube blocks transcript requests from known cloud IPs unless the request is authenticated.
-
-1. Install the [Get cookies.txt LOCALLY](https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc) Chrome extension
-2. Go to [youtube.com](https://youtube.com) while logged into your Google account
-3. Click the extension icon → **Export** — copy the full file content (Netscape cookie format)
-4. In Railway → Variables → add `YOUTUBE_COOKIES` with that content as the value
-
-The worker writes this to a temp file at startup and passes `--cookies <path>` to `yt-dlp` for transcript fetching.
+No YouTube credentials or cookies are required.
 
 ### Local vs production differences
 
 | | Local dev | Production |
 |---|---|---|
 | **yt-dlp binary** | Must be on system PATH (`brew install yt-dlp` / `pip install yt-dlp`) | Auto-downloaded to `worker/bin/yt-dlp_linux` via `postinstall` script — no system install needed |
-| **Transcript fetch** | `yt-dlp` works directly from a home/office IP | Requires `YOUTUBE_COOKIES` — YouTube blocks unauthenticated requests from cloud IPs |
-| **Video download** | Standard yt-dlp download works | Uses `--extractor-args youtube:player_client=android` — cloud IPs get 403 on stream URLs from web clients; the Android API generates un-IP-bound stream URLs. Cookies are intentionally **not** passed here because the Android client skips itself when cookies are present. |
+| **Transcript fetch** | `yt-dlp` works directly from a home/office IP | Uses `player_client=tv_embedded,android` — YouTube bot-checks the standard web client from cloud IPs; the TV embedded client bypasses this for metadata/subtitle extraction, with Android as fallback |
+| **Video download** | Standard yt-dlp download works | Uses `player_client=android` — cloud IPs get 403 on stream URLs from web clients; the Android API generates stream URLs without IP binding |
+| **PO token generation** | Not needed | `--js-runtimes node:${process.execPath}` passes the exact Node.js binary path to yt-dlp so it can execute YouTube's player JS to generate PO tokens (YouTube's own bot-bypass mechanism). Using `process.execPath` instead of `node` ensures yt-dlp finds the binary even if it's not on the system PATH. |
 | **Prisma client** | Generated on `npm install` | Generated during Railway build via `npm run build` (`npx prisma generate --schema=../prisma/schema.prisma`) |
 | **Environment** | `.env.local` files | Env vars set in Vercel and Railway dashboards |
 
@@ -230,9 +221,8 @@ clip-that/
 ├── worker/
 │   └── src/
 │       ├── index.ts              # Main poll loop
-│       ├── transcript.ts         # yt-dlp subtitle fetcher (replaced youtube-transcript-plus)
+│       ├── transcript.ts         # yt-dlp subtitle fetcher (tv_embedded + android clients)
 │       ├── ytdlp.ts              # Resolves yt-dlp binary path (local vs downloaded)
-│       ├── ytCookies.ts          # Writes YOUTUBE_COOKIES env var to temp file for yt-dlp
 │       ├── matcher.ts            # Keyword matching
 │       ├── semanticMatcher.ts    # Gemini embedding search
 │       ├── contextExpander.ts    # Window expansion + merge
