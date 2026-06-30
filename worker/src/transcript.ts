@@ -57,10 +57,11 @@ export async function fetchTranscript(videoId: string): Promise<TranscriptSegmen
         '--skip-download',
         '--sub-langs', 'en.*',
         '--convert-subs', 'srt',
-        // Android client bypasses cloud IP bot detection without needing cookies.
-        // Cookies must NOT be passed — Android client skips itself when they are present.
-        '--extractor-args', 'youtube:player_client=android',
-        '--js-runtimes', 'node',
+        // tv_embedded bypasses bot detection for metadata/subtitle extraction on cloud IPs.
+        // Fall back to android for videos where tv_embedded subs aren't available.
+        // process.execPath gives yt-dlp the exact Node.js binary for PO token generation.
+        '--extractor-args', 'youtube:player_client=tv_embedded,android',
+        '--js-runtimes', `node:${process.execPath}`,
         ...(ffmpegPath ? ['--ffmpeg-location', ffmpegPath] : []),
         '-o', join(tmpDir, 'video'),
         `https://www.youtube.com/watch?v=${videoId}`,

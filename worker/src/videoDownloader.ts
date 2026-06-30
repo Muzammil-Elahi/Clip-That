@@ -14,7 +14,7 @@ export async function downloadYouTubeVideo(
       // Android client generates stream URLs without IP-binding, bypassing 403 on cloud servers.
       // Cookies must NOT be passed — Android client skips itself when cookies are present.
       '--extractor-args', 'youtube:player_client=android',
-      '--js-runtimes', 'node',
+      '--js-runtimes', `node:${process.execPath}`,
       ...(ffmpegPath ? ['--ffmpeg-location', ffmpegPath] : []),
       '-o', destPath,
       youtubeUrl,
