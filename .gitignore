@@ -45,3 +45,6 @@ next-env.d.ts
 
 # ytdl-core / yt-dlp player script dumps (contain embedded API keys)
 worker/*-player-script.js
+
+# YouTube cookies — contain session tokens, must never be committed
+*cookies*.txt
