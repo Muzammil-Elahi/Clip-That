@@ -8,11 +8,13 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Card, CardContent } from '@/components/ui/card'
 import LoadingOverlay from '@/components/loading-overlay'
 
 /**
- * FormContent — nested inside the <form> so useFormStatus() can access the
- * enclosing form's pending state.
+ * FormContent — inside the <form> so useFormStatus() can read pending state.
+ * The LoadingOverlay it renders covers the entire outer relative container
+ * (brand mark + card) via absolute inset-0.
  */
 function FormContent({
   state,
@@ -33,10 +35,9 @@ function FormContent({
 
   return (
     <>
-      {/* Covers the entire relative container (including brand mark + form) */}
       <LoadingOverlay show={isPending} />
 
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-4">
         {sessionError && (
           <div aria-live="polite">
             <p className="text-sm text-destructive">{sessionError}</p>
@@ -44,12 +45,7 @@ function FormContent({
         )}
 
         <div className="flex flex-col gap-1.5">
-          <Label
-            htmlFor="youtubeUrl"
-            className="text-[0.6875rem] uppercase tracking-widest text-muted-foreground font-medium"
-          >
-            YouTube URL
-          </Label>
+          <Label htmlFor="youtubeUrl">YouTube URL</Label>
           <Input
             id="youtubeUrl"
             name="youtubeUrl"
@@ -58,7 +54,6 @@ function FormContent({
             aria-describedby={urlErrors.length > 0 ? 'youtubeUrl-error' : undefined}
             aria-invalid={urlErrors.length > 0 ? true : undefined}
             disabled={isPending}
-            className="h-10"
           />
           {urlErrors.length > 0 && (
             <p id="youtubeUrl-error" className="text-xs text-destructive" role="alert">
@@ -68,21 +63,15 @@ function FormContent({
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label
-            htmlFor="topic"
-            className="text-[0.6875rem] uppercase tracking-widest text-muted-foreground font-medium"
-          >
-            Topic
-          </Label>
+          <Label htmlFor="topic">Topic or phrase</Label>
           <Input
             id="topic"
             name="topic"
             type="text"
-            placeholder="e.g. gradient descent, photosynthesis, supply and demand"
+            placeholder="e.g. gradient descent, photosynthesis"
             aria-describedby={topicErrors.length > 0 ? 'topic-error' : undefined}
             aria-invalid={topicErrors.length > 0 ? true : undefined}
             disabled={isPending}
-            className="h-10"
           />
           {topicErrors.length > 0 && (
             <p id="topic-error" className="text-xs text-destructive" role="alert">
@@ -91,26 +80,19 @@ function FormContent({
           )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <Checkbox
             id="semanticEnabled"
             name="semanticEnabled"
             value="on"
             disabled={isPending}
           />
-          <Label
-            htmlFor="semanticEnabled"
-            className="text-sm text-muted-foreground font-normal cursor-pointer"
-          >
+          <Label htmlFor="semanticEnabled" className="font-normal text-muted-foreground cursor-pointer">
             Also find related references
           </Label>
         </div>
 
-        <Button
-          type="submit"
-          disabled={isPending}
-          className="h-10 w-full text-[0.6875rem] font-semibold tracking-widest uppercase mt-1"
-        >
+        <Button type="submit" disabled={isPending} className="w-full mt-1">
           Clip It
         </Button>
       </div>
@@ -119,9 +101,9 @@ function FormContent({
 }
 
 /**
- * SubmissionForm — client component for the YouTube URL + topic submission flow.
+ * SubmissionForm — client component for the YouTube URL + topic submission.
  *
- * Security (T-02-01): router.push('/status') — no query params, no hash, no jobId.
+ * Security (T-02-01): router.push('/status') — no query params, no jobId in URL.
  * Security (T-02-02): Error messages rendered as JSX text nodes, never innerHTML.
  */
 export default function SubmissionForm() {
@@ -135,31 +117,34 @@ export default function SubmissionForm() {
   }, [state, router])
 
   return (
-    /*
-     * relative — positioning context for the LoadingOverlay rendered inside
-     * FormContent. The overlay covers brand mark + form while pending.
-     */
-    <div className="relative w-full max-w-md">
-      <div className="flex flex-col gap-10">
-        {/* Brand mark + page heading — outside the <form> for correct semantics */}
-        <div>
-          <div className="flex items-center gap-2.5 mb-5" aria-hidden="true">
-            <span className="text-primary text-base leading-none select-none">▶</span>
-            <span className="font-semibold tracking-[0.22em] text-[0.6875rem] uppercase text-foreground/60">
-              Clip That
-            </span>
-          </div>
-          <h1 className="text-[2.25rem] font-semibold leading-[1.1] tracking-tight text-foreground">
-            Get only the parts<br />that matter.
-          </h1>
-          <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-            Paste a video URL and a topic — we&apos;ll find every moment where it&apos;s discussed.
-          </p>
-        </div>
+    <div className="w-full max-w-md">
+      {/* Brand mark — outside relative container so it stays visible during loading */}
+      <div className="flex items-center gap-2.5 mb-6">
+        <div className="ct-brand-icon" aria-hidden="true">▶</div>
+        <span className="text-sm font-semibold tracking-tight">Clip That</span>
+      </div>
 
-        <form action={formAction}>
-          <FormContent state={state} />
-        </form>
+      {/*
+       * relative — the LoadingOverlay (absolute inset-0) rendered inside FormContent
+       * positions here. Card's overflow-hidden clips it to the card's rounded corners.
+       */}
+      <div className="relative">
+        <Card>
+          <CardContent className="p-7">
+            <div className="mb-6">
+              <h1 className="text-2xl font-semibold leading-snug tracking-tight">
+                Paste a video.<br />Name a topic.
+              </h1>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                We&apos;ll find every moment where it&apos;s discussed — and cut everything else.
+              </p>
+            </div>
+
+            <form action={formAction}>
+              <FormContent state={state} />
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
