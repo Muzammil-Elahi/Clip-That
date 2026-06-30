@@ -3,7 +3,7 @@
  */
 
 /**
- * A single timestamped caption segment returned by youtube-transcript-plus.
+ * A single timestamped caption segment from the transcript fetcher.
  * Note: offset is seconds from video start — NOT 'start'.
  */
 export interface TranscriptSegment {
