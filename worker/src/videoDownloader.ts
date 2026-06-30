@@ -13,6 +13,8 @@ export async function downloadYouTubeVideo(
       '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
       '--merge-output-format', 'mp4',
       '--no-playlist',
+      // Android client generates stream URLs without IP-binding, bypassing 403 on cloud servers
+      '--extractor-args', 'youtube:player_client=android',
       '--js-runtimes', 'node',
       ...(cookiesPath ? ['--cookies', cookiesPath] : []),
       ...(ffmpegPath ? ['--ffmpeg-location', ffmpegPath] : []),
