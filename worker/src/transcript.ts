@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import ffmpegPath from 'ffmpeg-static'
 import { YTDLP_BIN } from './ytdlp.js'
+import { getCookiesPath } from './ytCookies.js'
 import type { TranscriptSegment } from './types.js'
 
 export class TranscriptUnavailableError extends Error {
@@ -51,6 +52,7 @@ export async function fetchTranscript(videoId: string): Promise<TranscriptSegmen
   try {
     const stderr: string[] = []
     const code = await new Promise<number>((resolve, reject) => {
+      const cookiesPath = getCookiesPath()
       const proc = spawn(YTDLP_BIN, [
         '--write-auto-subs',
         '--write-subs',
@@ -58,6 +60,7 @@ export async function fetchTranscript(videoId: string): Promise<TranscriptSegmen
         '--sub-langs', 'en.*',
         '--convert-subs', 'srt',
         '--js-runtimes', 'node',
+        ...(cookiesPath ? ['--cookies', cookiesPath] : []),
         ...(ffmpegPath ? ['--ffmpeg-location', ffmpegPath] : []),
         '-o', join(tmpDir, 'video'),
         `https://www.youtube.com/watch?v=${videoId}`,
