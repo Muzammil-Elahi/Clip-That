@@ -1,22 +1,20 @@
 import { spawn } from 'node:child_process'
 import ffmpegPath from 'ffmpeg-static'
 import { YTDLP_BIN } from './ytdlp.js'
-import { getCookiesPath } from './ytCookies.js'
 
 export async function downloadYouTubeVideo(
   youtubeUrl: string,
   destPath: string,
 ): Promise<void> {
   await new Promise<void>((resolve, reject) => {
-    const cookiesPath = getCookiesPath()
     const args = [
       '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
       '--merge-output-format', 'mp4',
       '--no-playlist',
-      // Android client generates stream URLs without IP-binding, bypassing 403 on cloud servers
+      // Android client generates stream URLs without IP-binding, bypassing 403 on cloud servers.
+      // Cookies must NOT be passed — Android client skips itself when cookies are present.
       '--extractor-args', 'youtube:player_client=android',
       '--js-runtimes', 'node',
-      ...(cookiesPath ? ['--cookies', cookiesPath] : []),
       ...(ffmpegPath ? ['--ffmpeg-location', ffmpegPath] : []),
       '-o', destPath,
       youtubeUrl,
