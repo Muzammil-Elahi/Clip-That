@@ -33,12 +33,12 @@ The worker ([worker/src/index.ts](worker/src/index.ts)) is a long-running Node.j
 
 | Step | What happens |
 |------|-------------|
-| 1. Transcript fetch | Downloads the auto-generated YouTube captions via `youtube-transcript-plus` |
+| 1. Transcript fetch | Downloads auto-generated YouTube captions via `yt-dlp` (`--write-auto-subs --convert-subs srt`) |
 | 2. Keyword matching | Scans each transcript segment for mentions of the topic |
 | 3. Semantic matching *(optional)* | Embeds the topic and all segments with `gemini-embedding-001`, returns segments above a cosine similarity threshold |
 | 4. Context expansion | Expands each matched window by a few segments in each direction so clips don't start mid-sentence |
 | 5. Study notes | Passes the stitched transcript to Gemini and asks it to produce student-focused Markdown notes |
-| 6. Video download | Downloads the full video with `yt-dlp` |
+| 6. Video download | Downloads the full video with `yt-dlp` using the Android player client |
 | 7. Segment extraction | Uses FFmpeg to cut the matched time ranges from the source file |
 | 8. Stitching | Concatenates the segments into a single output MP4 |
 | 9. Upload | Uploads the stitched video to Supabase Storage and stores a 24-hour signed URL |
@@ -61,7 +61,7 @@ One table: `Job`. Key columns: `youtubeUrl`, `topic`, `status`, `transcript` (JS
 | Realtime | Supabase Realtime (WebSocket) |
 | Storage | Supabase Storage |
 | AI | Google Gemini (`gemini-embedding-001` for embeddings, `gemini-3.0-flash` for study notes) |
-| Video | `yt-dlp` (download), `ffmpeg-static` (cut + stitch) |
+| Video | `yt-dlp` (transcript + download), `ffmpeg-static` (cut + stitch) |
 
 ---
 
@@ -148,6 +148,68 @@ Go to [http://localhost:3000](http://localhost:3000), paste a YouTube URL, enter
 
 ---
 
+## Deploying to production
+
+The app deploys as two separate services. The Next.js frontend goes to Vercel; the worker goes to Railway. Several things that work transparently in local dev required explicit fixes in production.
+
+### Next.js app → Vercel
+
+**Build command** (set in Vercel project settings → Build & Output Settings):
+```
+npx prisma generate && next build
+```
+
+**Environment variables** (Vercel project settings → Environment Variables):
+
+| Variable | Value |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Settings → API → Project URL |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase → Settings → API → anon/public key |
+| `DATABASE_URL` | Supabase → Settings → Database → **Transaction pooler** connection string (port 6543) |
+| `DIRECT_URL` | Supabase → Settings → Database → **Direct connection** string (port 5432) |
+
+> **Local vs prod:** Locally, Prisma reads `.env.local` automatically. On Vercel, env vars must be set explicitly in the dashboard. The `worker/` directory is excluded from the root `tsconfig.json` to prevent Vercel's type-checker from failing on worker-only code.
+
+### Worker → Railway
+
+1. New Project → Deploy from GitHub repo → select this repo
+2. **Settings → General → Root Directory**: `worker`
+3. **Settings → General → Build Command**: `npm run build`
+4. **Settings → General → Start Command**: `npm start`
+
+**Environment variables** (Railway service → Variables tab):
+
+| Variable | Value |
+|---|---|
+| `WORKER_DATABASE_URL` | Supabase → Settings → Database → **Direct connection** string (port 5432) — use direct, not pooled |
+| `SUPABASE_URL` | Supabase → Settings → API → Project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API → service_role key |
+| `GEMINI_API_KEY` | Google AI Studio |
+| `YOUTUBE_COOKIES` | See below |
+
+#### Setting `YOUTUBE_COOKIES`
+
+Railway's servers are in AWS data centers. YouTube blocks transcript requests from known cloud IPs unless the request is authenticated.
+
+1. Install the [Get cookies.txt LOCALLY](https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc) Chrome extension
+2. Go to [youtube.com](https://youtube.com) while logged into your Google account
+3. Click the extension icon → **Export** — copy the full file content (Netscape cookie format)
+4. In Railway → Variables → add `YOUTUBE_COOKIES` with that content as the value
+
+The worker writes this to a temp file at startup and passes `--cookies <path>` to `yt-dlp` for transcript fetching.
+
+### Local vs production differences
+
+| | Local dev | Production |
+|---|---|---|
+| **yt-dlp binary** | Must be on system PATH (`brew install yt-dlp` / `pip install yt-dlp`) | Auto-downloaded to `worker/bin/yt-dlp_linux` via `postinstall` script — no system install needed |
+| **Transcript fetch** | `yt-dlp` works directly from a home/office IP | Requires `YOUTUBE_COOKIES` — YouTube blocks unauthenticated requests from cloud IPs |
+| **Video download** | Standard yt-dlp download works | Uses `--extractor-args youtube:player_client=android` — cloud IPs get 403 on stream URLs from web clients; the Android API generates un-IP-bound stream URLs. Cookies are intentionally **not** passed here because the Android client skips itself when cookies are present. |
+| **Prisma client** | Generated on `npm install` | Generated during Railway build via `npm run build` (`npx prisma generate --schema=../prisma/schema.prisma`) |
+| **Environment** | `.env.local` files | Env vars set in Vercel and Railway dashboards |
+
+---
+
 ## Project structure
 
 ```
@@ -168,15 +230,19 @@ clip-that/
 ├── worker/
 │   └── src/
 │       ├── index.ts              # Main poll loop
-│       ├── transcript.ts         # YouTube caption fetcher
+│       ├── transcript.ts         # yt-dlp subtitle fetcher (replaced youtube-transcript-plus)
+│       ├── ytdlp.ts              # Resolves yt-dlp binary path (local vs downloaded)
+│       ├── ytCookies.ts          # Writes YOUTUBE_COOKIES env var to temp file for yt-dlp
 │       ├── matcher.ts            # Keyword matching
 │       ├── semanticMatcher.ts    # Gemini embedding search
 │       ├── contextExpander.ts    # Window expansion + merge
 │       ├── notesGenerator.ts     # Gemini study notes
-│       ├── videoDownloader.ts    # yt-dlp wrapper
+│       ├── videoDownloader.ts    # yt-dlp wrapper (Android client)
 │       ├── videoExtractor.ts     # FFmpeg segment cutter
 │       ├── videoStitcher.ts      # FFmpeg concat
 │       └── storageUploader.ts    # Supabase Storage upload
+│   └── scripts/
+│       └── install-ytdlp.mjs     # Downloads yt-dlp_linux binary on postinstall (Linux only)
 └── prisma/
     └── schema.prisma
 ```
