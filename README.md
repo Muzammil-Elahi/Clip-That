@@ -60,7 +60,7 @@ One table: `Job`. Key columns: `youtubeUrl`, `topic`, `status`, `transcript` (JS
 | Auth | Supabase anonymous auth |
 | Realtime | Supabase Realtime (WebSocket) |
 | Storage | Supabase Storage |
-| AI | Google Gemini (`gemini-embedding-001` for embeddings, `gemini-2.0-flash` for study notes) |
+| AI | Google Gemini (`gemini-embedding-001` for embeddings, `gemini-3.0-flash` for study notes) |
 | Video | `yt-dlp` (download), `ffmpeg-static` (cut + stitch) |
 
 ---
