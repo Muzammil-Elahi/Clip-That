@@ -18,7 +18,7 @@ if (existsSync(dest)) {
 mkdirSync(binDir, { recursive: true })
 console.log('Downloading yt-dlp...')
 execSync(
-  `curl -fsSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o "${dest}"`,
+  `curl -fsSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o "${dest}"`,
   { stdio: 'inherit' },
 )
 execSync(`chmod +x "${dest}"`)
