@@ -4,7 +4,6 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import ffmpegPath from 'ffmpeg-static'
 import { YTDLP_BIN } from './ytdlp.js'
-import { getCookiesPath } from './ytCookies.js'
 import type { TranscriptSegment } from './types.js'
 
 export class TranscriptUnavailableError extends Error {
@@ -52,15 +51,16 @@ export async function fetchTranscript(videoId: string): Promise<TranscriptSegmen
   try {
     const stderr: string[] = []
     const code = await new Promise<number>((resolve, reject) => {
-      const cookiesPath = getCookiesPath()
       const proc = spawn(YTDLP_BIN, [
         '--write-auto-subs',
         '--write-subs',
         '--skip-download',
         '--sub-langs', 'en.*',
         '--convert-subs', 'srt',
+        // Android client bypasses cloud IP bot detection without needing cookies.
+        // Cookies must NOT be passed — Android client skips itself when they are present.
+        '--extractor-args', 'youtube:player_client=android',
         '--js-runtimes', 'node',
-        ...(cookiesPath ? ['--cookies', cookiesPath] : []),
         ...(ffmpegPath ? ['--ffmpeg-location', ffmpegPath] : []),
         '-o', join(tmpDir, 'video'),
         `https://www.youtube.com/watch?v=${videoId}`,
