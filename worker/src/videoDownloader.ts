@@ -1,9 +1,6 @@
 import { spawn } from 'node:child_process'
 import ffmpegPath from 'ffmpeg-static'
-
-// yt-dlp is the canonical downloader (installed via pip). ytdl-core was dropped
-// because YouTube regularly breaks its decipher parser (D-02 upgrade path).
-const YTDLP_BIN = process.platform === 'win32' ? 'yt-dlp.exe' : 'yt-dlp'
+import { YTDLP_BIN } from './ytdlp.js'
 
 export async function downloadYouTubeVideo(
   youtubeUrl: string,

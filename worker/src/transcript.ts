@@ -3,11 +3,8 @@ import { readFile, readdir, rm, mkdtemp } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import ffmpegPath from 'ffmpeg-static'
+import { YTDLP_BIN } from './ytdlp.js'
 import type { TranscriptSegment } from './types.js'
-
-// yt-dlp bypasses YouTube's IP-blocking of data center ranges; youtube-transcript-plus
-// makes raw HTTP requests that get rejected from cloud provider IPs.
-const YTDLP_BIN = process.platform === 'win32' ? 'yt-dlp.exe' : 'yt-dlp'
 
 export class TranscriptUnavailableError extends Error {
   constructor(videoId: string) {

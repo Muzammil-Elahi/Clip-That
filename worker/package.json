@@ -6,7 +6,8 @@
     "start": "tsx src/index.ts",
     "test": "vitest",
     "test:run": "vitest --run",
-    "build": "npx prisma generate --schema=../prisma/schema.prisma"
+    "build": "npx prisma generate --schema=../prisma/schema.prisma",
+    "postinstall": "node scripts/install-ytdlp.mjs"
   },
   "dependencies": {
     "@distube/ytdl-core": "^4.16.12",
